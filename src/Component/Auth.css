@@ -1,0 +1,234 @@
+/* ==========================================================================
+   Luxury Minimalist Auth Page Subsystem Elements 
+   ========================================================================== */
+.auth-viewport {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #070512;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+
+.auth-viewport *,
+.auth-viewport *::before,
+.auth-viewport *::after {
+  box-sizing: border-box;
+}
+
+/* Glassmorphic Container Panel Card Configuration */
+.auth-glass-container {
+  width: 100%;
+  max-width: 25.75rem; /* ~412px proportional scaling cap layout bounds */
+  background: linear-gradient(135deg, rgba(25, 22, 56, 0.45) 0%, rgba(15, 12, 38, 0.65) 100%);
+  border: 1px solid rgba(145, 94, 255, 0.12);
+  border-radius: 1.25rem;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Brand Banner System Identity Typography rules */
+.auth-brand-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-bolt-icon {
+  font-size: 1.75rem;
+  color: #915EFF;
+  display: block;
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(0 0 10px rgba(145, 94, 255, 0.6));
+}
+
+.auth-brand-text {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.auth-gradient-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.auth-brand-subtitle {
+  font-size: 11px;
+  color: #6b7280;
+  margin: 0.375rem 0 0 0;
+  font-weight: 500;
+}
+
+/* Dynamic State Forms Framework */
+.auth-form-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.auth-stage-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+}
+
+.auth-otp-notice {
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.5;
+  margin: -0.75rem 0 0.5rem 0;
+}
+
+/* Input Fields & Token Inset Element Groups */
+.auth-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.auth-input-group.center-content {
+  align-items: center;
+}
+
+.auth-input-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 0.05em;
+}
+
+.auth-text-field {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.75rem;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.auth-text-field:focus {
+  border-color: #915EFF;
+  box-shadow: 0 0 10px rgba(145, 94, 255, 0.15);
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Prefix positioning layout rules */
+.auth-phone-field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.auth-country-prefix {
+  position: absolute;
+  left: 1rem;
+  font-size: 14px;
+  font-weight: 700;
+  color: #10b981; /* Emerald country identity block indicator */
+}
+
+.phone-input-inset {
+  padding-left: 3.25rem !important;
+  letter-spacing: 0.5px;
+}
+
+/* Central Numeric SMS Input Alignment modifications */
+.otp-center-field {
+  max-width: 12rem;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  padding: 0.75rem !important;
+  border-color: rgba(145, 94, 255, 0.3);
+  color: #fbbf24;
+}
+
+/* Interactive Dispatch Trigger CTA Buttons Layout */
+.auth-action-submit-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background-image: linear-gradient(135deg, #915EFF 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: none;
+  font-weight: 800;
+  font-size: 0.875rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  letter-spacing: 0.025em;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 20px rgba(145, 94, 255, 0.25);
+  transition: transform 0.1s active, opacity 0.2s;
+}
+
+.auth-action-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.verification-accent-btn {
+  background-image: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+/* Operational Exception Notice Banners */
+.auth-error-banner {
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 0.75rem 1rem;
+  border-radius: 0.625rem;
+  color: #fca5a5;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+/* Structural Toggle Navigation Link Blocks */
+.auth-mode-switch-footer {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.auth-mode-switch-footer p {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.auth-mode-switch-footer span {
+  color: #915EFF;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 0.25rem;
+  transition: color 0.15s;
+}
+
+.auth-mode-switch-footer span:hover {
+  color: #a855f7;
+}
+
+/* Micro Scalings specific to hyper-compact terminal width states */
+@media (max-width: 360px) {
+  .auth-glass-container {
+    padding: 1.5rem 1rem;
+  }
+}

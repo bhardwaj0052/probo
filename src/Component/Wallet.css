@@ -1,0 +1,469 @@
+/* ==========================================================================
+   1. System Color Foundations
+   ========================================================================== */
+:root {
+  --brand-dark: #0B0819;
+  --brand-card: #13112B;
+  --purple-primary: #915EFF;
+  --neon-emerald: #34d399;
+  --danger-crimson: #f87171;
+}
+
+.wallet-page-container {
+  min-height: 100vh;
+  background-color: var(--brand-dark);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ==========================================================================
+   2. Layout Header Navbar
+   ========================================================================== */
+.wallet-page-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  background-color: rgba(11, 8, 25, 0.8);
+  backdrop-filter: blur(12px);
+  border-b: 1px solid rgba(145, 94, 255, 0.15);
+}
+
+.wallet-header-wrap {
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+@media (min-width: 1024px) {
+  .wallet-header-wrap {
+    padding: 0.75rem 2rem;
+  }
+}
+
+.wallet-page-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.wallet-logo-icon {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--purple-primary);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(145, 94, 255, 0.4);
+}
+
+.wallet-logo-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.wallet-logo-accent {
+  color: #a855f7;
+}
+
+.global-wallet-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: rgba(145, 94, 255, 0.1);
+  border: 1px solid rgba(145, 94, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   3. Content Overview & Metric Breakdowns
+   ========================================================================== */
+.wallet-page-layout {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .wallet-page-layout {
+    padding: 3rem 2rem;
+  }
+}
+
+.wallet-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .wallet-summary-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+/* Balance Card Settings */
+.balance-breakdown-card {
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .balance-breakdown-card {
+    grid-column: span 7 / span 7;
+  }
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.balance-headline {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.verified-shield {
+  font-size: 0.75rem;
+  color: var(--neon-emerald);
+  background-color: rgba(52, 211, 153, 0.08);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.primary-coin-metric {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.balance-sub-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  border-top: 1px solid rgba(145, 94, 255, 0.12);
+  padding-top: 1.25rem;
+}
+
+.metric-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.metric-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.text-purple { color: #c084fc; }
+.text-emerald { color: var(--neon-emerald); }
+
+/* Quick Actions Management Form */
+.wallet-quick-actions {
+  border: 1px solid rgba(145, 94, 255, 0.15);
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .wallet-quick-actions {
+    grid-column: span 5 / span 5;
+  }
+}
+
+.actions-header-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.actions-header-subtitle {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 0.25rem 0 1.5rem 0;
+}
+
+.action-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .action-button-group {
+    flex-direction: row;
+  }
+}
+
+.action-btn {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-deposit {
+  background-color: var(--purple-primary);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-deposit:hover {
+  background-color: #7a4ee0;
+}
+
+.btn-withdraw {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-withdraw:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.action-compliance-notice {
+  font-size: 10px;
+  color: #6b7280;
+  margin-top: auto;
+  padding-top: 1rem;
+  text-align: center;
+}
+
+/* ==========================================================================
+   4. Transaction Ledger Table System
+   ========================================================================== */
+.wallet-ledger-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ledger-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .ledger-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.ledger-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.ledger-filters {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.ledger-tab {
+  padding: 0.375rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-active {
+  background-color: rgba(145, 94, 255, 0.12);
+  color: var(--purple-primary);
+  border-color: rgba(145, 94, 255, 0.25);
+}
+
+.tab-inactive {
+  background-color: transparent;
+  color: #9ca3af;
+}
+
+.tab-inactive:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Table Architecture Elements */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(145, 94, 255, 0.12);
+  border-radius: 1rem;
+  background-color: var(--brand-card);
+}
+
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+  min-width: 48rem;
+}
+
+.ledger-table th {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: 1rem;
+  color: #9ca3af;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(145, 94, 255, 0.12);
+}
+
+.ledger-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  vertical-align: middle;
+}
+
+.ledger-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ledger-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+.txn-id {
+  font-family: monospace;
+  font-weight: 700;
+  color: #a855f7;
+}
+
+.txn-desc {
+  font-weight: 600;
+  color: #f3f4f6;
+}
+
+.txn-date {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+.txn-type-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  letter-spacing: 0.025em;
+}
+
+.txn-type-pill.credit {
+  background-color: rgba(52, 211, 153, 0.08);
+  color: var(--neon-emerald);
+}
+
+.txn-type-pill.debit {
+  background-color: rgba(248, 113, 113, 0.08);
+  color: var(--danger-crimson);
+}
+
+.txn-amount {
+  font-weight: 800;
+}
+
+.amt-credit { color: var(--neon-emerald); }
+.amt-debit { color: #ffffff; }
+
+.status-success-dot {
+  font-size: 0.75rem;
+  color: var(--neon-emerald);
+  font-weight: 600;
+}
+
+/* Structural Layout Alignment mappings */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+/* ==========================================================================
+   5. Navigation Control Elements (Back Button Styling)
+   ========================================================================== */
+.navigation-control-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: -1rem; /* Safely pulls grid content closer without breaking flex rows */
+}
+
+.back-navigation-btn {
+  background-color: transparent;
+  border: 1px solid rgba(145, 94, 255, 0.12);
+  color: #9ca3af;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-navigation-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-color: rgba(145, 94, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(145, 94, 255, 0.05);
+}
+
+.back-arrow-vector {
+  font-size: 0.95rem;
+  transition: transform 0.2s ease;
+}
+
+.back-navigation-btn:hover .back-arrow-vector {
+  transform: translateX(-3px); /* Interactive visual push on active hover states */
+}

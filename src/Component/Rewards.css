@@ -1,0 +1,591 @@
+/* ==========================================================================
+   1. Scope Design Variables & Base Overrides
+   ========================================================================== */
+:root {
+  --brand-dark: #0B0819;
+  --brand-card: #13112B;
+  --purple-primary: #915EFF;
+  --neon-emerald: #34d399;
+  --live-amber: #fbbf24;
+  --lost-crimson: #f87171;
+}
+
+.rewards-container {
+  min-height: 100vh;
+  background-color: var(--brand-dark);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ==========================================================================
+   2. Sticky Header Navbar
+   ========================================================================== */
+.rewards-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  background-color: rgba(11, 8, 25, 0.8);
+  backdrop-filter: blur(12px);
+  border-b: 1px solid rgba(145, 94, 255, 0.15);
+}
+
+.rewards-header-wrap {
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+@media (min-width: 1024px) {
+  .rewards-header-wrap {
+    padding: 0.75rem 2rem;
+  }
+}
+
+.rewards-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.rewards-logo-icon {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--purple-primary);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(145, 94, 255, 0.4);
+}
+
+.rewards-logo-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.rewards-logo-accent {
+  color: #a855f7;
+}
+
+.rewards-user-wallet {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: rgba(145, 94, 255, 0.1);
+  border: 1px solid rgba(145, 94, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   3. Workspace Hero Framework Layout
+   ========================================================================== */
+.rewards-layout {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+@media (min-width: 1024px) {
+  .rewards-layout {
+    padding: 3rem 2rem;
+  }
+}
+
+.rewards-hero-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .rewards-hero-section {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+.rewards-headline-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .rewards-headline-block {
+    grid-column: span 6 / span 6;
+  }
+}
+
+.rewards-tagline {
+  color: #a855f7;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.rewards-title {
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .rewards-title {
+    font-size: 3.5rem;
+  }
+}
+
+.rewards-title-highlight {
+  color: var(--purple-primary);
+  filter: drop-shadow(0 0 20px rgba(145, 94, 255, 0.4));
+}
+
+.rewards-description {
+  color: #9ca3af;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 32rem;
+  margin: 0;
+}
+
+/* ==========================================================================
+   4. Rupee Portfolio Metrics Panel
+   ========================================================================== */
+.rewards-balance-panel {
+  padding: 1.75rem;
+  border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .rewards-balance-panel {
+    grid-column: span 6 / span 6;
+  }
+}
+
+.balance-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.balance-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.balance-investment-row {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid rgba(145, 94, 255, 0.15);
+  padding-top: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.invest-sublabel {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.invest-subvalue {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-top: 0.25rem;
+}
+
+.invest-divider-line {
+  height: 2rem;
+  background-color: rgba(145, 94, 255, 0.15);
+}
+
+.text-amber { color: var(--live-amber); }
+.text-emerald { color: var(--neon-emerald); }
+.text-gray { color: #6b7280; }
+
+/* ==========================================================================
+   5. Reward Filters & History Feed
+   ========================================================================== */
+.rewards-catalog-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.catalog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .catalog-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.catalog-section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.catalog-filters {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.filter-tab {
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-tab-active {
+  background-color: var(--purple-primary);
+  color: #ffffff;
+}
+
+.filter-tab-inactive {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: #9ca3af;
+  border-color: rgba(145, 94, 255, 0.1);
+}
+
+.filter-tab-inactive:hover {
+  color: #ffffff;
+  border-color: rgba(145, 94, 255, 0.3);
+}
+
+/* Prediction Tracking Cards Architecture Grid */
+.rewards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .rewards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .rewards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.reward-card {
+  border: 1px solid rgba(145, 94, 255, 0.15);
+  padding: 1.25rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.reward-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(145, 94, 255, 0.35);
+}
+
+.reward-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.reward-brand-identity {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.brand-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.brand-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.brand-type-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: #6b7280;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* Dynamic State Status Pills */
+.status-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  letter-spacing: 0.025em;
+}
+
+.pill-live {
+  background-color: rgba(253, 230, 138, 0.08);
+  color: var(--live-amber);
+  border: 1px solid rgba(253, 230, 138, 0.2);
+}
+
+.pill-won {
+  background-color: rgba(52, 211, 153, 0.08);
+  color: var(--neon-emerald);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.pill-lost {
+  background-color: rgba(248, 113, 113, 0.08);
+  color: var(--lost-crimson);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.reward-card-divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(145, 94, 255, 0.1);
+}
+
+.reward-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.trade-position-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.position-label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.position-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e5e7eb;
+}
+
+.reward-cost-metrics {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.cost-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.cost-rupees {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.claim-action-btn {
+  width: 100%;
+  padding: 0.625rem;
+  background-color: rgba(145, 94, 255, 0.08);
+  border: 1px solid rgba(145, 94, 255, 0.2);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.25rem;
+}
+
+.claim-action-btn:hover {
+  background-color: var(--purple-primary);
+  border-color: transparent;
+}
+
+.text-right { text-align: right; }
+/* ==========================================================================
+   Fixed Identity & Flag Badge Component Structures
+   ========================================================================== */
+.reward-brand-identity {
+  display: flex;
+  gap: 0.875rem;
+  align-items: center;
+  flex: 1;
+}
+
+/* Base structural avatar layer for isolated single items */
+.brand-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* New clean layout class wrapper for Team Matches */
+.versus-flag-block {
+  width: 3.25rem;
+  height: 2.75rem;
+  background-color: rgba(145, 94, 255, 0.05);
+  border: 1px solid rgba(145, 94, 255, 0.15);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.25rem;
+}
+
+.mini-flag-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.team-badge-txt {
+  font-size: 10px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.025em;
+}
+
+.vs-center-divider {
+  font-size: 9px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: lowercase;
+  margin: 1px 0;
+}
+
+.brand-title-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+/* ==========================================================================
+   Navigation Control Elements (Back Button Styling)
+   ========================================================================== */
+.navigation-control-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: -1rem; 
+}
+
+.back-navigation-btn {
+  background-color: transparent;
+  border: 1px solid rgba(145, 94, 255, 0.12);
+  color: #9ca3af;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-navigation-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-color: rgba(145, 94, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(145, 94, 255, 0.05);
+}
+
+.back-arrow-vector {
+  font-size: 0.95rem;
+  transition: transform 0.2s ease;
+}
+
+.back-navigation-btn:hover .back-arrow-vector {
+  transform: translateX(-3px);
+}

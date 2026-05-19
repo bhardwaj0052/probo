@@ -1,0 +1,908 @@
+/* ==========================================================================
+   1. Design System Tokens & Global Document Configuration
+   ========================================================================== */
+:root {
+  --brand-dark: #070512;
+  --brand-card: #110E26;
+  --purple-primary: #915EFF;
+  --neon-emerald: #10b981;
+  --border-glow: rgba(145, 94, 255, 0.12);
+  --navbar-bg: rgba(7, 5, 18, 0.75);
+}
+
+.app-container {
+  min-height: 100vh;
+  background-color: var(--brand-dark);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Enforces rigid box sizing calculations cross-application */
+.app-container *, 
+.app-container *::before, 
+.app-container *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   2. Overhauled Navbar Component (Luxury Minimalist Aesthetic)
+   ========================================================================== */
+.premium-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background-color: var(--navbar-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.navbar-wrapper {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand-logo-block {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.brand-bolt {
+  font-size: 1.25rem;
+  color: var(--purple-primary);
+  filter: drop-shadow(0 0 8px rgba(145, 94, 255, 0.6));
+}
+
+.brand-name-text {
+  font-size: 1.125rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Floating Clean Route Tabs Layout */
+.central-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.luxury-nav-item {
+  position: relative;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.luxury-nav-item:hover {
+  color: #ffffff;
+}
+
+.active-tab {
+  color: #ffffff !important;
+}
+
+/* Premium Neon indicator underlines */
+.active-indicator-bar {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--purple-primary);
+  border-radius: 99px;
+  box-shadow: 0 0 10px var(--purple-primary);
+}
+
+.navbar-actions-panel {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Unified currency metric token block */
+.rupee-balance-pill {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.45rem 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.balance-currency-symbol {
+  color: var(--neon-emerald);
+  font-weight: 800;
+  font-size: 0.875rem;
+}
+
+.balance-numerical-value {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.luxury-avatar-badge {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: radial-gradient(circle at top left, #1c183a, #110e26);
+  border: 1px solid rgba(145, 94, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.luxury-avatar-badge:hover {
+  border-color: var(--purple-primary);
+  box-shadow: 0 0 12px rgba(145, 94, 255, 0.2);
+}
+
+.avatar-core-initial {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.avatar-ping-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--neon-emerald);
+  border: 1.5px solid var(--brand-dark);
+  border-radius: 50%;
+}
+
+.luxury-auth-btn {
+  background-color: var(--purple-primary);
+  color: #ffffff;
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.luxury-auth-btn:hover {
+  background-color: #7a4ee0;
+}
+
+/* ==========================================================================
+   3. Workspace Content Framework Layout Matrix
+   ========================================================================== */
+.main-layout {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .main-layout {
+    padding: 4rem 2rem;
+    gap: 4rem;
+  }
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: 3rem;
+  }
+}
+
+.branding-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .branding-sidebar {
+    grid-column: span 5 / span 5;
+    position: sticky;
+    top: 6rem;
+    gap: 2rem;
+  }
+}
+
+.tagline {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #a855f7;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.hero-title {
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 3rem;
+    line-height: 1.1;
+  }
+}
+
+.hero-title-highlight {
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  background-image: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+}
+
+.hero-description {
+  font-size: 0.9375rem;
+  color: #9ca3af;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cta-button {
+  background-image: linear-gradient(135deg, #915EFF 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  max-width: 100%;
+  box-shadow: 0 4px 20px rgba(145, 94, 255, 0.3);
+  transition: transform 0.15s;
+}
+
+@media (min-width: 640px) {
+  .cta-button { width: max-content; }
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+}
+
+.micro-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1.25rem;
+}
+
+.micro-features div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.micro-item-icon { font-size: 1.125rem; }
+.micro-item-text { font-size: 11px; font-weight: 700; color: #6b7280; letter-spacing: 0.05em; }
+
+.workspace-area {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .workspace-area {
+    grid-column: span 7 / span 7;
+  }
+}
+
+/* ==========================================================================
+   4. Glassmorphic Live Match Card & Fixed VS Arena Configuration
+   ========================================================================== */
+.glass-match-card {
+  background: linear-gradient(135deg, rgba(25, 22, 56, 0.5) 0%, rgba(15, 12, 38, 0.7) 100%);
+  border: 1px solid var(--border-glow);
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100%;
+}
+
+.countdown-badge {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fbbf24;
+  background-color: rgba(251, 191, 36, 0.08);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #fbbf24;
+  border-radius: 50%;
+}
+
+.card-header-title { font-size: 1.25rem; font-weight: 800; margin: 0; text-align: left; }
+.card-header-subtitle { font-size: 11px; color: #6b7280; margin: 0.25rem 0 0 0; text-align: left; }
+
+/* BULLETPROOF VS ARENA MATRIX (Desktop Standard Layout) */
+.vs-arena {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.5rem 0;
+  background-color: rgba(0, 0, 0, 0.15);
+  padding: 1.5rem 1rem;
+  border-radius: 1rem;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.vs-arena .space-y-2 {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 !important; 
+}
+
+.team-flag { font-size: 1.75rem; line-height: 1; }
+.team-name { font-size: 0.875rem; font-weight: 700; margin-top: 0.25rem; white-space: normal; text-align: center; color: #ffffff; }
+.team-votes-purple { font-size: 1.125rem; font-weight: 900; color: #c084fc; margin-top: 0.25rem; white-space: nowrap; }
+.team-votes-green { font-size: 1.125rem; font-weight: 900; color: var(--neon-emerald); margin-top: 0.25rem; white-space: nowrap; }
+.votes-subtext { font-size: 10px; font-weight: 500; color: #6b7280; margin-left: 0.125rem; }
+
+.vs-divider {
+  font-size: 10px;
+  font-weight: 800;
+  color: #4b5563;
+  background-color: rgba(255, 255, 255, 0.03);
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+.poll-question-prompt { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 1rem 0; text-align: left; }
+.vote-action-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background-color: var(--purple-primary);
+  color: #ffffff;
+  border: none;
+  font-weight: 800;
+  font-size: 0.875rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  letter-spacing: 0.025em;
+  transition: background-color 0.15s;
+}
+
+.vote-action-btn:hover { background-color: #7a4ee0; }
+
+/* ==========================================================================
+   5. Slider Carousels & Trending Subgrids
+   ========================================================================== */
+.section-title { font-size: 0.9375rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; text-align: left; }
+
+.categories-carousel {
+  display: flex;
+  gap: 0.625rem;
+  overflow-x: auto;
+  padding: 0.25rem 0 0.75rem 0;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.categories-carousel::-webkit-scrollbar { display: none; }
+
+.category-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.category-card-inactive {
+  background-color: #13112B;
+  border-color: rgba(255, 255, 255, 0.04);
+  color: #9ca3af;
+}
+
+.category-card-inactive:hover {
+  background-color: rgba(145, 94, 255, 0.05);
+  border-color: rgba(145, 94, 255, 0.2);
+  color: #ffffff;
+}
+
+.category-icon { font-size: 1rem; }
+.category-name { font-size: 0.8125rem; font-weight: 700; }
+
+.trending-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.trending-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; width: 100%; }
+
+@media (min-width: 640px) {
+  .trending-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.trend-card {
+  background-color: var(--brand-card);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 1.25rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: border-color 0.2s;
+}
+
+.trend-card:hover { border-color: rgba(145, 94, 255, 0.25); }
+
+.live-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.08);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+}
+
+.timestamp-badge { font-size: 10px; color: #6b7280; font-weight: 600; }
+.trend-question { font-size: 0.875rem; font-weight: 700; line-height: 1.4; margin: 0; color: #f3f4f6; text-align: left; }
+.trend-card-btn {
+  width: max-content;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.trend-card:hover .trend-card-btn {
+  background-color: var(--purple-primary);
+  border-color: var(--purple-primary);
+}
+
+/* Marketing Info Panel Layout Rules */
+.marketing-row { display: grid; grid-template-columns: 1fr; gap: 1rem; width: 100%; }
+@media (min-width: 1024px) { .marketing-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; width: 100%; } }
+
+.info-panel, .center-showcase-card {
+  background-color: #110E26;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+}
+
+.info-panel-title, .center-showcase-title { font-size: 1rem; font-weight: 800; margin: 0 0 1rem 0; text-align: left; }
+.info-list { display: flex; flex-direction: column; gap: 1rem; }
+.info-item { display: flex; gap: 0.75rem; align-items: flex-start; text-align: left; }
+
+.info-icon-wrapper-purple, .info-icon-wrapper-amber, .center-showcase-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.info-icon-wrapper-purple { background-color: rgba(145, 94, 255, 0.1); color: #c084fc; }
+.info-icon-wrapper-amber { background-color: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+.center-showcase-icon { background-color: rgba(59, 130, 246, 0.1); color: #60a5fa; font-size: 1.125rem; margin-bottom: 0.75rem; }
+
+.info-heading { font-size: 0.875rem; font-weight: 700; margin: 0 0 0.125rem 0; }
+.info-desc, .center-showcase-desc { font-size: 11px; color: #6b7280; line-height: 1.5; margin: 0; text-align: left; }
+.center-showcase-card { display: flex; flex-direction: column; align-items: flex-start; }
+.center-showcase-title { margin-bottom: 0.25rem; }
+
+/* ==========================================================================
+   6. Complete Responsive Media Breakpoints Layout Fixes
+   ========================================================================== */
+@media (max-width: 768px) {
+  .premium-navbar {
+    padding: 0.25rem 0;
+  }
+
+  .navbar-wrapper {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .central-nav-links {
+    grid-column: span 2;
+    order: 3;
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(145, 94, 255, 0.06);
+    padding: 0.35rem;
+    border-radius: 0.625rem;
+    gap: 0.5rem; 
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .central-nav-links::-webkit-scrollbar { display: none; }
+
+  .luxury-nav-item {
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.875rem;
+    flex: 1;
+    text-align: center;
+  }
+
+  .active-indicator-bar {
+    bottom: 0;
+    height: 100%;
+    background-color: rgba(145, 94, 255, 0.12);
+    border: 1px solid var(--purple-primary);
+    z-index: -1;
+    border-radius: 0.375rem;
+    box-shadow: none;
+  }
+
+  .navbar-actions-panel {
+    order: 2;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .rupee-balance-pill {
+    padding: 0.35rem 0.625rem;
+    border-radius: 0.5rem;
+  }
+
+  .balance-currency-symbol, .balance-numerical-value {
+    font-size: 12px;
+  }
+
+  .luxury-avatar-badge {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+
+  .avatar-core-initial { font-size: 0.75rem; }
+  .luxury-auth-btn { font-size: 11px; padding: 0.35rem 0.625rem; }
+
+  /* TARGETS MOBILE DEVICES (412px etc): Forces absolute center alignments */
+  .vs-arena {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1.25rem !important;
+    padding: 1.5rem 1rem !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .vs-arena .space-y-2 {
+    width: 100% !important;
+    flex: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important; 
+    gap: 0.25rem !important;
+  }
+
+  .team-name {
+    text-align: center !important;
+    width: 100%;
+  }
+
+  .vs-divider {
+    margin: 0.5rem auto !important;
+  }
+
+  .glass-match-card {
+    padding: 1.25rem !important;
+  }
+
+  .card-header-title, .card-header-subtitle {
+    text-align: center !important;
+  }
+
+  .hero-title { font-size: 2rem !important; }
+  .poll-question-prompt { font-size: 0.9375rem !important; text-align: center !important; width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: 1.75rem !important; }
+  .card-header-title { font-size: 1.125rem !important; }
+  .team-flag { font-size: 1.5rem !important; }
+  .team-name { font-size: 0.8125rem !important; }
+  .main-layout { padding: 1.5rem 0.75rem; gap: 2rem; }
+}
+
+/* Functional Layout Helper Spacing Utilities */
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+.items-center { align-items: center; }
+.gap-3 { gap: 0.75rem; }
+/* ==========================================================================
+   Premium Slanted VS Arena Card Modules (Slim Optimized)
+   ========================================================================== */
+.preview-premium-card {
+  background: #0b081e !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+  max-width: 100%;
+}
+
+/* Absolute Floating Timer Stamp (Compact) */
+.premium-time-badge {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e11d48;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 10;
+}
+
+/* Graphic Slope Container (Slimmed from 180px down to 110px) */
+.premium-vs-arena {
+  display: flex;
+  width: 100%;
+  height: 110px; 
+  position: relative;
+  background: #080616;
+}
+
+.team-slope-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 10px;
+}
+
+/* Slanted Color Background Trajectories */
+.team-india-slanted {
+  background: linear-gradient(135deg, #004b93 0%, #002868 100%);
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+  padding-right: 10%;
+}
+
+.team-pakistan-slanted {
+  background: linear-gradient(135deg, #005826 0%, #003314 100%);
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+  padding-left: 10%;
+}
+
+/* Central Overlay Badge (Scaled down) */
+.premium-vs-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vs-accent-text {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 26px; /* Slimmer font */
+  font-style: italic;
+  font-weight: 900;
+  color: #facc15;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.6), 1.5px 1.5px 0px #000;
+}
+
+/* Internal Alignment (Compact scaling) */
+.team-meta-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  width: 100%;
+  text-align: center;
+}
+
+.team-flag-emoji {
+  font-size: 20px; /* Slimmer emoji graphics */
+  margin-bottom: 2px;
+}
+
+.team-display-name {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.team-display-percentage {
+  font-size: 16px;
+  font-weight: 900;
+  margin-top: 1px;
+}
+
+.team-display-sub {
+  font-size: 9px;
+  opacity: 0.6;
+}
+
+/* Poll Text Typography Layouts (Centered and Tightened) */
+.premium-prompt-section {
+  text-align: center !important;
+  padding: 12px 16px 8px 16px;
+  width: 100%;
+}
+
+.premium-poll-title {
+  font-size: 16px !important;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 auto 2px auto !important;
+  text-align: center !important;
+}
+
+.premium-poll-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+/* Slimmed Selection Buttons Layout (Centered text alignment fixes) */
+.premium-buttons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 12px 16px;
+  width: 100%;
+}
+
+.vote-btn-pill {
+  width: 100%;
+  padding: 10px !important; /* Slimmed heights */
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: center !important;
+  display: block;
+}
+
+.btn-india {
+  background: #0066cc;
+}
+
+.btn-pakistan {
+  background: #00873c;
+}
+
+/* Statistical Metrics Footer Ledger */
+.premium-ledger-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ledger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ledger-label {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.ledger-value-accent {
+  font-size: 11px;
+  font-weight: 700;
+  color: #eab308;
+}
+
+.ledger-value-bold {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+}
