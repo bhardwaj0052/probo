@@ -4,11 +4,7 @@ import './Home.css';
 
 export default function Home() {
   const navigate = useNavigate();
-  
-  // State controller managing the navbar profile authentication layer
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
-
-  // Configured market categories mapping profile attributes
   const categories = [
     { icon: "⚽", name: "Sports", active: false, accent: "#fbbf24" },
     { icon: "🏛️", name: "Politics", active: true, accent: "#3b82f6" },
@@ -17,8 +13,6 @@ export default function Home() {
     { icon: "💻", name: "Tech", active: false, accent: "#a855f7" },
     { icon: "⚔️", name: "Fun Battles", active: false, accent: "#f43f5e" },
   ];
-
-  // Global Trending feed list view database records
   const trendingQuestions = [
     { 
       id: 1, 

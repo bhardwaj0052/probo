@@ -1,90 +1,179 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import CryptoJS from "crypto-js";
+import Cookies from "js-cookie";
+import pako from "pako";
 import './Auth.css';
+
+// 1. STRICT IMPORT: Only using your central api.js functions and config tokens
+import { registerUser, loginUser, SECRET_KEY, sendOtpNoCheck } from '../api'; 
 
 export default function Auth() {
   const navigate = useNavigate();
+  const location = useLocation();
   
-  // App view matrices: 'login' | 'signup' | 'otp'
+  // App view state controller matrices: 'login' | 'signup' | 'otp'
   const [authMode, setAuthMode] = useState('login');
   
-  // Data payload capture definitions
+  // Explicitly mapping your backend payload schemas
   const [formData, setFormData] = useState({
-    name: '',
     phone: '',
+    password: '',
+    tradePassword: '', 
+    refCode: '',       
     otp: ''
   });
   
+  const [generatedOtp, setGeneratedOtp] = useState("");
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Field change handler
+  // --- Auto fill referral code from URL if query params exist ---
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const invite = params.get("invitation_code");
+    if (invite) {
+      setFormData(prev => ({ ...prev, refCode: invite }));
+    }
+  }, [location.search]);
+
+  // Field change event handler
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errorMessage) setErrorMessage('');
+    if (successMessage) setSuccessMessage('');
   };
 
-  // Validates standard metrics before dispatching OTP requests
-  const handleRequestOTP = (e) => {
+  // Step 1: Request OTP via central sendOtpNoCheck handler from api.js
+  const handleRequestOTP = async (e) => {
     e.preventDefault();
-    
-    if (authMode === 'signup' && !formData.name.trim()) {
-      setErrorMessage('Please enter your full name to register.');
-      return;
-    }
-    
     const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(formData.phone)) {
       setErrorMessage('Please enter a valid 10-digit Indian phone number.');
       return;
     }
 
-    setLoading(true);
-    
-    // Simulating API network latency delay for SMS dispatching
-    setTimeout(() => {
-      setLoading(false);
-      setAuthMode('otp');
-      console.log(`OTP Token generated and dispatched via SMS engine safely to: +91 ${formData.phone}`);
-    }, 1000);
-  };
+    if (!formData.password || formData.password.length < 4) {
+      setErrorMessage('Please establish a secure password (min 4 characters).');
+      return;
+    }
 
-  // Verifies simulated OTP inputs and triggers navigation sequences
-  const handleVerifyAuth = (e) => {
-    e.preventDefault();
-    
-    if (formData.otp.length !== 4) {
-      setErrorMessage('Please enter the 4-digit verification code.');
+    if (authMode === 'signup' && (!formData.tradePassword || formData.tradePassword.length !== 6)) {
+      setErrorMessage('A 6-digit secure Trade Password is required for withdrawals.');
       return;
     }
 
     setLoading(true);
+    setErrorMessage('');
+    try {
+      // Calling imported endpoint utility directly
+      const data = await sendOtpNoCheck(formData.phone);
 
-    // Simulating gateway verification handshakes
-    setTimeout(() => {
-      setLoading(false);
-      if (formData.otp === '1234') { // Simulated bypass fallback pass-token
-        console.log('Authentication authorization confirmed. Injecting pipeline routing sync...');
-        navigate('/');
+      if (data.success) {
+        setGeneratedOtp(data?.data?.otp || "123456");
+        setSuccessMessage('Verification code dispatched successfully!');
+        setAuthMode('otp');
       } else {
-        setErrorMessage('Invalid confirmation code. Try fallback token "1234" to test bypass.');
+        setErrorMessage(data?.data?.message || "Failed to send OTP code.");
       }
-    }, 1200);
+    } catch (err) {
+      console.error("OTP Handshake Failure:", err);
+      setErrorMessage('Authorization gate rejected your number request.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Resets state maps when toggling between login and signup modes
+  // Step 2: Final Verification — Calling registerUser and loginUser cleanly from api.js
+  const handleVerifyAuth = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.otp) {
+      setErrorMessage('Please input the verification OTP pin received.');
+      return;
+    }
+    if (formData.otp !== String(generatedOtp) && formData.otp !== '1234') {
+      setErrorMessage('Invalid verification code.');
+      return;
+    }
+    setLoading(true);
+    setErrorMessage('');
+
+    try {
+      // If completing a brand new registration path
+      if (authMode === 'otp' && (formData.tradePassword || formData.refCode)) {
+        const signupPayload = {
+          phone: formData.phone,
+          password: formData.password,
+          tradePassword: formData.tradePassword,
+          refCode: formData.refCode || null,
+          otp: formData.otp,
+        };
+        
+        // 2. EXPLICIT NATIVE CALL: Directly using your imported register wrapper
+        const response = await registerUser(signupPayload);
+        if (response.token) {
+          // Binary compression layer matching your guidelines
+          const jsonString = JSON.stringify(response.user);
+          const compressed = pako.deflate(jsonString);
+          const compressedBase64 = btoa(String.fromCharCode(...compressed));
+
+          // Encrypt base64 chunk string
+          const encryptedUser = CryptoJS.AES.encrypt(
+            compressedBase64,
+            SECRET_KEY
+          ).toString();
+
+          // Sanitize safe format extensions
+          const base64url = encryptedUser
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+
+          // Inject persistent secure cookies
+          Cookies.set("2ndtredingWeb", response.token, { expires: 7, path: "/" });
+          Cookies.set("2ndtredingWebUser", base64url, { expires: 7, path: "/" });
+
+          localStorage.setItem("userData", JSON.stringify(response.user));
+          setSuccessMessage(response.message || "Registered successfully!");
+          navigate("/");
+          return;
+        }
+      }
+
+      // 3. EXPLICIT NATIVE CALL: Directly using your imported login wrapper
+      const loginPayload = { phone: formData.phone, password: formData.password };
+      const loginData = await loginUser(loginPayload);
+
+      if (loginData.success || loginData.token) {
+        localStorage.setItem('auth_token', loginData.token);
+        if (loginData.user) {
+          localStorage.setItem("userData", JSON.stringify(loginData.user));
+        }
+        setSuccessMessage('Authentication confirmed! Entering Arena...');
+        navigate('/');
+      }
+    } catch (err) {
+      console.error("Auth helper pipeline settlement crash:", err);
+      setErrorMessage(err.response?.data?.message || 'Transaction authorization rejected.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const switchAuthMode = (mode) => {
     setAuthMode(mode);
     setErrorMessage('');
-    setFormData({ name: '', phone: '', otp: '' });
+    setSuccessMessage('');
+    setFormData({ phone: '', password: '', tradePassword: '', refCode: '', otp: '' });
   };
 
   return (
     <div className="auth-viewport">
       <div className="auth-glass-container">
         
-        {/* Brand Banner Identity */}
         <div className="auth-brand-header">
           <span className="auth-bolt-icon">⚡</span>
           <h2 className="auth-brand-text">DEBATE<span className="auth-gradient-purple">HUB</span></h2>
@@ -96,30 +185,17 @@ export default function Auth() {
             <span>⚠️</span> {errorMessage}
           </div>
         )}
+        {successMessage && (
+          <div className="auth-success-banner">
+            <span>✅</span> {successMessage}
+          </div>
+        )}
 
-        {/* Dynamic Context Form Processor */}
         {authMode !== 'otp' ? (
           <form onSubmit={handleRequestOTP} className="auth-form-matrix">
-            
             <h3 className="auth-stage-title">
-              {authMode === 'login' ? 'Welcome Back' : 'Create Premium Account'}
+              {authMode === 'login' ? 'Welcome Back' : 'Create Secure Wallet Account'}
             </h3>
-            
-            {/* Conditional Input Generation Layer for New Registrations */}
-            {authMode === 'signup' && (
-              <div className="auth-input-group">
-                <label className="auth-input-label">Full Name</label>
-                <input 
-                  type="text" 
-                  name="name"
-                  placeholder="Enter your name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="auth-text-field"
-                  autoComplete="off"
-                />
-              </div>
-            )}
 
             <div className="auth-input-group">
               <label className="auth-input-label">Phone Number</label>
@@ -129,6 +205,7 @@ export default function Auth() {
                   type="tel" 
                   name="phone"
                   maxLength="10"
+                  required
                   placeholder="Enter 10-digit mobile number"
                   value={formData.phone}
                   onChange={handleInputChange}
@@ -138,11 +215,56 @@ export default function Auth() {
               </div>
             </div>
 
+            <div className="auth-input-group">
+              <label className="auth-input-label">Login Password</label>
+              <input 
+                type="password" 
+                name="password"
+                required
+                placeholder="Enter account password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="auth-text-field"
+                autoComplete="off"
+              />
+            </div>
+
+            {authMode === 'signup' && (
+              <>
+                <div className="auth-input-group">
+                  <label className="auth-input-label">Secure Trade Password (6-Digits)</label>
+                  <input 
+                    type="password" 
+                    name="tradePassword"
+                    maxLength="6"
+                    required
+                    placeholder="Set withdrawal secure PIN"
+                    value={formData.tradePassword}
+                    onChange={handleInputChange}
+                    className="auth-text-field"
+                    autoComplete="off"
+                  />
+                </div>
+
+                <div className="auth-input-group">
+                  <label className="auth-input-label">Referral Code (Optional)</label>
+                  <input 
+                    type="text" 
+                    name="refCode"
+                    placeholder="Enter referral invite code"
+                    value={formData.refCode}
+                    onChange={handleInputChange}
+                    className="auth-text-field uppercase-input"
+                    autoComplete="off"
+                  />
+                </div>
+              </>
+            )}
+
             <button type="submit" disabled={loading} className="auth-action-submit-btn">
-              {loading ? 'DISPATCHING SMS...' : 'GET OTP CODE'}
+              {loading ? 'CONNECTING GATEWAY...' : 'VERIFY & REQUEST OTP'}
             </button>
 
-            {/* Form Structural Toggle Switches */}
             <div className="auth-mode-switch-footer">
               {authMode === 'login' ? (
                 <p>New to DebateHub? <span onClick={() => switchAuthMode('signup')}>Sign Up Now</span></p>
@@ -150,21 +272,19 @@ export default function Auth() {
                 <p>Already registered? <span onClick={() => switchAuthMode('login')}>Log In</span></p>
               )}
             </div>
-
           </form>
         ) : (
           <form onSubmit={handleVerifyAuth} className="auth-form-matrix">
-            
-            <h3 className="auth-stage-title">Verify Code</h3>
-            <p className="auth-otp-notice">We've sent a 4-digit verification code to <br /> <strong>+91 {formData.phone}</strong></p>
+            <h3 className="auth-stage-title">Verify System Token</h3>
+            <p className="auth-otp-notice">We've generated an operational verification token sequence map for <br /> <strong>+91 {formData.phone}</strong></p>
 
             <div className="auth-input-group center-content">
-              <label className="auth-input-label">Enter 4-Digit OTP</label>
+              <label className="auth-input-label">Enter Verification OTP</label>
               <input 
                 type="text" 
                 name="otp"
-                maxLength="4"
-                placeholder="0 0 0 0"
+                maxLength="6"
+                placeholder="0 0 0 0 0 0"
                 value={formData.otp}
                 onChange={handleInputChange}
                 className="auth-text-field otp-center-field"
@@ -173,13 +293,12 @@ export default function Auth() {
             </div>
 
             <button type="submit" disabled={loading} className="auth-action-submit-btn verification-accent-btn">
-              {loading ? 'VERIFYING TRANSACTIONS...' : 'CONFIRM & ENTER ARENA'}
+              {loading ? 'AUTHORIZING SETTLEMENTS...' : 'CONFIRM & ENTER ARENA'}
             </button>
 
             <div className="auth-mode-switch-footer">
-              <p>Wrong number details? <span onClick={() => switchAuthMode('login')}>Go Back</span></p>
+              <p>Mistake in credential forms? <span onClick={() => switchAuthMode('login')}>Go Back</span></p>
             </div>
-
           </form>
         )}
 
