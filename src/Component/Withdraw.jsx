@@ -13,7 +13,9 @@ import {
 import CryptoJS from "crypto-js";
 import Cookies from "js-cookie";
 import pako from "pako";
-const encryptedUser = Cookies.get("proboWebUser");
+
+// ✅ FIXED: Target your exact system auth cookie string key instead of proboWebUser
+const encryptedUser = Cookies.get("2ndtredingWebUser");
 
 const Withdraw = () => {
   const navigate = useNavigate();
@@ -36,32 +38,38 @@ const Withdraw = () => {
   const [balance, setBalance] = useState(0);
   const [responseMessage, setResponseMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
   const getUserId = async () => {
     if (encryptedUser) {
-   
-          const base64 = encryptedUser.replace(/-/g, "+").replace(/_/g, "/");
-                    
-                        // 🔹 3. AES decrypt (gives compressed Base64 string)
-                        const decryptedBase64 = CryptoJS.AES.decrypt(base64, SECRET_KEY).toString(CryptoJS.enc.Utf8);
-                        if (!decryptedBase64) return null;
-                    
-                        // 🔹 4. Convert Base64 → Uint8Array (binary bytes)
-                        const binaryString = atob(decryptedBase64);
-                        const bytes = new Uint8Array(binaryString.length);
-                        for (let i = 0; i < binaryString.length; i++) {
-                          bytes[i] = binaryString.charCodeAt(i);
-                        }
-                    
-                        // 🔹 5. Decompress (restore JSON string)
-                        const decompressed = pako.inflate(bytes, { to: "string" });
-                    const UserData = await JSON.parse(decompressed);
-                   
-       setUserId(UserData?._id);
-         setIsLoading(false);
+      const base64 = encryptedUser.replace(/-/g, "+").replace(/_/g, "/");
+      // 🔹 3. AES decrypt (gives compressed Base64 string)
+      const decryptedBase64 = CryptoJS.AES.decrypt(base64, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+      if (!decryptedBase64) return null;
+      
+      // 🔹 4. Convert Base64 → Uint8Array (binary bytes)
+      const binaryString = atob(decryptedBase64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      // 🔹 5. Decompress (restore JSON string)
+      const decompressed = pako.inflate(bytes, { to: "string" });
+      const UserData = await JSON.parse(decompressed);
+      
+      setUserId(UserData?._id);
+      setIsLoading(false);
       return UserData?._id;
+    } else {
+      // ✅ FALLBACK GUARD: If the cookie isn't accessible, grab the active user ID from localStorage as an instant backup
+      const backupUid = localStorage.getItem("userId");
+      if (backupUid) {
+        setUserId(backupUid);
+        setIsLoading(false);
+        return backupUid;
+      }
     }
-      return null;
-    
+    return null;
   };
 
   const fetchBankDetails = async () => {
@@ -100,7 +108,6 @@ const Withdraw = () => {
     try {
       const res = await addBankDetails({ userId, holderName, accountNumber, ifscCode, bankName, upiId });
       setHasBankDetails(true);
-           
       setBankDetails(res?.bankDetails);
       setIsAdding(false);
       setResponseMessage({ type: "success", message: res.message });
@@ -117,13 +124,10 @@ const Withdraw = () => {
         tradePassword: BUpTRadePassword,
         bankDetails: { holderName, accountNumber, ifscCode, bankName, upiId },
       });
-      
-  setResponseMessage({ type: "error", message: err.response?.data?.message || "Bank update failed" });
- 
       setBankDetails(res?.data?.bankDetails);
       setResponseMessage({ type: "success", message: res.data.message });
       setBUpTRadePassword("");
-      setIsEditing(false); // ✅ exit edit mode
+      setIsEditing(false); // exit edit mode
     } catch (err) {
       setResponseMessage({ type: "error", message: err.response?.data?.message || "Bank update error" });
     }
@@ -144,92 +148,95 @@ const Withdraw = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container2">
       <div className="header2">
         <button className="back-btnR" onClick={() => navigate(-1)}>
-          <ArrowLeft color="black" />
+          <ArrowLeft color="#ffffff" />
         </button>
-        <h1 className="header-title">Withdraw</h1>
+        <h1 className="header-title">Withdrawal Desk</h1>
         <div className="spacer"></div>
       </div>
 
       <div className="main-content">
-        <div className="card0 withdrawal-form-card">
+        <div className="card0 withdrawal-form-card glass-panel">
           <div className="balance-info">
-            <span className="balance-label">Withdrawal Balance:</span>
+            <span className="balance-label">Available Withdrawable Funds:</span>
             <span className="balance-amount">₹ {balance || 0}</span>
           </div>
 
           <div className="input-group">
             {responseMessage && <div className={`response-card ${responseMessage.type}`}>{responseMessage.message}</div>}
 
-            {/* Bank Details */}
+            {/* Bank Details Config Section */}
             {!hasBankDetails ? (
               <>
                 {!isAdding ? (
-                  <button className="apply-button" onClick={() => setIsAdding(true)}>
-                    + Add Bank Details
+                  <button className="apply-button add-bank-trigger" onClick={() => setIsAdding(true)}>
+                    + Link New Bank Account
                   </button>
                 ) : (
-                  <>
+                  <div className="bank-form">
                     <input type="text" className="input-field" placeholder="Account Holder Name" value={holderName} onChange={(e) => setHolderName(e.target.value)} />
                     <input type="number" className="input-field" placeholder="Account Number" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />
                     <input type="text" className="input-field" placeholder="IFSC Code" value={ifscCode} onChange={(e) => setIfscCode(e.target.value)} />
                     <input type="text" className="input-field" placeholder="Bank Name" value={bankName} onChange={(e) => setBankName(e.target.value)} />
                     <input type="text" className="input-field" placeholder="UPI ID (Optional)" value={upiId} onChange={(e) => setUpiId(e.target.value)} />
                     <div className="btn-group">
-                      <button onClick={handleAddBank} className="apply-button">Save</button>
+                      <button onClick={handleAddBank} className="apply-button">Save Details</button>
                       <button onClick={() => setIsAdding(false)} className="cancel-button">Cancel</button>
                     </div>
-                  </>
+                  </div>
                 )}
               </>
             ) : (
-              <div>
-                <span className="balance-label">My Bank Details</span>
+              <div className="bank-info-display-box">
+                <span className="section-mini-headline">Linked Settlement Account</span>
                 {isEditing ? (
-                  <>
+                  <div className="bank-form">
                     <input type="text" className="input-field" value={holderName} onChange={(e) => setHolderName(e.target.value)} placeholder="Holder Name" />
                     <input type="number" className="input-field" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="Account Number" />
                     <input type="text" className="input-field" value={ifscCode} onChange={(e) => setIfscCode(e.target.value)} placeholder="IFSC Code" />
                     <input type="text" className="input-field" value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="Bank Name" />
                     <input type="text" className="input-field" value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="UPI ID (Optional)" />
-                    <input type="password" className="input-field mt-2" placeholder="Trade Password" value={BUpTRadePassword} onChange={(e) => setBUpTRadePassword(e.target.value)} />
+                    <input type="password" className="input-field mt-2 strong-glow" placeholder="Confirm Trade Password" value={BUpTRadePassword} onChange={(e) => setBUpTRadePassword(e.target.value)} />
                     <div className="btn-group">
-                      <button onClick={handleUpdateBank} className="apply-button">Save</button>
+                      <button onClick={handleUpdateBank} className="apply-button">Save Changes</button>
                       <button onClick={() => setIsEditing(false)} className="cancel-button">Cancel</button>
                     </div>
-                  </>
+                  </div>
                 ) : (
-                  <>
-                    <p><b>Holder:</b> {bankDetails.holderName??""}</p>
-                    <p><b>Account:</b> {bankDetails.accountNumber??""}</p>
-                    <p><b>IFSC:</b> {bankDetails.ifscCode??""}</p>
-                    <p><b>Bank:</b> {bankDetails.bankName??""}</p>
-                    {bankDetails.upiId && <p><b>UPI:</b> {bankDetails.upiId??""}</p>}
-                    <button onClick={() => setIsEditing(true)} className="apply-button">Edit</button>
-                  </>
+                  <div className="static-bank-details-card">
+                    <p><span>Account Holder:</span> <strong>{holderName || ""}</strong></p>
+                    <p><span>Account No:</span> <strong>{accountNumber || ""}</strong></p>
+                    <p><span>IFSC Code:</span> <strong>{ifscCode || ""}</strong></p>
+                    <p><span>Bank Name:</span> <strong>{bankName || ""}</strong></p>
+                    {upiId && <p><span>UPI ID:</span> <strong>{upiId || ""}</strong></p>}
+                    <button onClick={() => setIsEditing(true)} className="apply-button btn-secondary">Modify Account Info</button>
+                  </div>
                 )}
               </div>
             )}
 
-            {/* Withdrawal */}
-            {hasBankDetails && (
-              <>
-                <input type="number" className="input-field" placeholder="Withdrawal Amount" value={withdrawalAmount} onChange={(e) => setWithdrawalAmount(e.target.value)} />
-                <input type="password" className="input-field" placeholder="Trade Password" value={tradePassword} onChange={(e) => setTradePassword(e.target.value)} />
-                <button onClick={handleWithdrawal} disabled={isLoading} className="apply-button">{isLoading ? <Loader2 className="spin" /> : "Apply Withdrawal"} </button>
-              </>
+            {/* Withdrawal Processing Form Block */}
+            {hasBankDetails && !isEditing && (
+              <div className="payout-execution-stack">
+                <span className="section-mini-headline">Request Instant Settlement</span>
+                <input type="number" className="input-field" placeholder="Enter Withdrawal Amount (INR)" value={withdrawalAmount} onChange={(e) => setWithdrawalAmount(e.target.value)} />
+                <input type="password" className="input-field" placeholder="Enter 6-Digit Trade Password" value={tradePassword} onChange={(e) => setTradePassword(e.target.value)} />
+                <button onClick={handleWithdrawal} disabled={isLoading} className="apply-button payout-execute-btn">
+                  {isLoading ? <Loader2 className="spin animation-rotation" /> : "Confirm & Withdraw Funds"}
+                </button>
+              </div>
             )}
 
-            {/* Rules */}
+            {/* Platform Rules Compliance Block */}
             <div className="explanation">
-              <h2 className="explanation-title">Explain</h2>
+              <h2 className="explanation-title">Settle Guidelines & Compliance</h2>
               <ol className="rules-list">
-                <li>Daily marketing from 00:00:00 to 23:59:59.</li>
-                <li>Withdraw amount between 300 to 500000.</li>
-                <li>Only one withdrawal per day.</li>
-                <li>Withdrawal rate 5%.</li>
+                <li>Daily marketplace balance audit processing runs from 00:00:00 to 23:59:59.</li>
+                <li>Allowed individual settlement boundaries range between ₹300 minimum and ₹5,00,000 maximum.</li>
+                <li>To secure ledger accounts balance limits, only one withdrawal request is permitted daily.</li>
+                <li>Standard gateway platform maintenance and automated payout service rate is 5%.</li>
               </ol>
             </div>
           </div>

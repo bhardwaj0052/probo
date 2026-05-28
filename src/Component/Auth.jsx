@@ -187,14 +187,6 @@ export default function Auth() {
   return (
     <div className="auth-viewport">
       <div className="auth-glass-container">
-        
-        {/* ✅ ADDED: Premium Inline Navigation Back Button */}
-        <div className="auth-top-nav-bar">
-          <button type="button" className="auth-back-home-btn" onClick={() => navigate('/')}>
-            ← <span className="back-home-txt">Back</span>
-          </button>
-        </div>
-
         <div className="auth-brand-header">
           <span className="auth-bolt-icon">⚡</span>
           <h2 className="auth-brand-text">DEBATE<span className="auth-gradient-purple">HUB</span></h2>

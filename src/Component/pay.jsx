@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Smile,
   Loader2,
   CheckCircle,
   AlertTriangle,
   Clock,
-
   ArrowLeft,
 } from "lucide-react";
 import "./pay.css";
@@ -14,7 +13,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
 import Cookies from "js-cookie";
 import pako from "pako";
-
 
 const QRCode = async () => {
   const res = await QRrandom();
@@ -29,6 +27,9 @@ const QRCode = async () => {
 
 const Pay = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const timerRef = useRef(null);
+
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [qrImageName, setQrImageName] = useState("");
   const [upiId, setupiId] = useState("");
@@ -39,19 +40,16 @@ const Pay = () => {
   const [message, setMessage] = useState({ text: "", type: "" });
   const [timer, setTimer] = useState(300); // countdown (in seconds)
   const [user, setuser] = useState(null); 
-  const navigate = useNavigate();
-  const timerRef = useRef(null);
 
   // 🧩 Fetch new QR code
   const fetchQRCode = async () => {
-    
     setMessage({ text: "Fetching latest QR code...", type: "info" });
     try {
       const data = await QRCode();
       setQrCodeUrl(data.url);
       setQrImageName(data.filename);
       setMessage({
-        text: "QR Code loaded. Please complete payment within 1 minute.",
+        text: "QR Code loaded. Please complete payment within the time limit.",
         type: "info",
       });
     } catch (error) {
@@ -66,226 +64,177 @@ const Pay = () => {
 
   // 🔐 Get user data
   const getUserData = async() => {
-    const encryptedUser = Cookies.get("proboWebUser");
+    const encryptedUser = Cookies.get("2ndtredingWebUser");
     if (encryptedUser) {
-     const base64 = encryptedUser.replace(/-/g, "+").replace(/_/g, "/");
-               
-                   // 🔹 3. AES decrypt (gives compressed Base64 string)
-                   const decryptedBase64 = CryptoJS.AES.decrypt(base64, SECRET_KEY).toString(CryptoJS.enc.Utf8);
-                   if (!decryptedBase64) return null;
-               
-                   // 🔹 4. Convert Base64 → Uint8Array (binary bytes)
-                   const binaryString = atob(decryptedBase64);
-                   const bytes = new Uint8Array(binaryString.length);
-                   for (let i = 0; i < binaryString.length; i++) {
-                     bytes[i] = binaryString.charCodeAt(i);
-                   }
-               
-                   // 🔹 5. Decompress (restore JSON string)
-                   const decompressed = pako.inflate(bytes, { to: "string" });
-                const data = await JSON.parse(decompressed);
-                setuser(data)
-                setIsLoading(true);
+      const base64 = encryptedUser.replace(/-/g, "+").replace(/_/g, "/");
+      const decryptedBase64 = CryptoJS.AES.decrypt(base64, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+      if (!decryptedBase64) return null;
+      
+      const binaryString = atob(decryptedBase64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      const decompressed = pako.inflate(bytes, { to: "string" });
+      const data = await JSON.parse(decompressed);
+      setuser(data);
+      setIsLoading(true);
       if (!data?._id) navigate("/login");
+    } else {
+      const backupUid = localStorage.getItem("userId");
+      if (backupUid) setuser({ _id: backupUid });
     }
   };
-// --- Constants ---
 
+  const currency = "INR";
 
-const currency = "INR";
+  const isMobileDevice = () =>
+    /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
 
-const isMobileDevice = () =>
-  /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
+  const initiatePayment = (appName) => {
+    let currentAmount = String(price).trim();
 
-const initiatePayment = (appName) => {
-  let currentAmount = String(price).trim();
+    if (!upiId) {
+      setMessage({ text: "UPI ID is missing. Cannot proceed.", type: "error" });
+      return;
+    }
 
-  if (!upiId) {
-    setMessage({ text: "UPI ID is missing. Cannot proceed.", type: "error" });
-    return;
-  }
+    if (!currentAmount || parseFloat(currentAmount) <= 0) {
+      currentAmount = "1.00";
+    }
 
-  if (!currentAmount || parseFloat(currentAmount) <= 0) {
-    currentAmount = "1.00"; // default minimum amount
-  }
+    const formattedAmount = parseFloat(currentAmount).toFixed(2);
+    const transactionNote = `Recharge for User ${user?._id || "Guest"} via ${appName}`;
 
-  const formattedAmount = parseFloat(currentAmount).toFixed(2);
-  const transactionNote = `Recharge for User ${user?._id || "Guest"} via ${appName}`;
+    const params = new URLSearchParams();
+    params.append("pa", upiId);
+    params.append("pn", payeeName);
+    params.append("am", formattedAmount);
+    params.append("cu", currency);
+    params.append("tn", transactionNote);
 
-  // ✅ Prepare URL Params
-  const params = new URLSearchParams();
-  params.append("pa", upiId);
-  params.append("pn", payeeName);
-  params.append("am", formattedAmount);
-  params.append("cu", currency);
-  params.append("tn", transactionNote);
+    if (appName === "Paytm") {
+      const intentUrl = `intent://upi/pay?${params.toString()}#Intent;scheme=paytm;package=net.one97.paytm;end;`;
 
-  // ✅ Handle Paytm separately using Intent-based scheme
-  if (appName === "Paytm") {
-    const intentUrl = `intent://upi/pay?${params.toString()}#Intent;scheme=paytm;package=net.one97.paytm;end;`;
+      if (isMobileDevice()) {
+        window.location.href = intentUrl;
+        setTimeout(() => {
+          setMessage({
+            text: "Paytm app not detected. Opening Paytm website...",
+            type: "info",
+          });
+          window.open("https://paytm.com/", "_blank");
+        }, 2500);
 
-    if (isMobileDevice()) {
-      console.log("Opening Paytm Intent:", intentUrl);
-
-      window.location.href = intentUrl;
-
-      // Fallback after 2.5s
-      setTimeout(() => {
         setMessage({
-          text: "Paytm app not detected. Opening Paytm website...",
+          text: `Opening Paytm app to pay ₹${formattedAmount}...`,
           type: "info",
         });
+      } else {
         window.open("https://paytm.com/", "_blank");
+        setMessage({
+          text: "Opening Paytm website. Please scan QR or pay manually.",
+          type: "info",
+        });
+      }
+      return;
+    }
+
+    let schemeBase = appName === "PhonePe" ? "phonepe://pay?" : "upi://pay?";
+    const upiUrl = schemeBase + params.toString();
+
+    if (isMobileDevice()) {
+      window.location.href = upiUrl;
+      setTimeout(() => {
+        setMessage({
+          text: `${appName} not detected. Opening website instead...`,
+          type: "info",
+        });
+        if (appName === "PhonePe") window.open("https://www.phonepe.com/", "_blank");
       }, 2500);
 
       setMessage({
-        text: `Opening Paytm app to pay ₹${formattedAmount}...`,
+        text: `Opening ${appName} app to pay ₹${formattedAmount}...`,
         type: "info",
       });
     } else {
-      window.open("https://paytm.com/", "_blank");
-      setMessage({
-        text: "Opening Paytm website. Please scan QR or pay manually.",
-        type: "info",
-      });
+      let fallbackUrl = appName === "PhonePe" ? "https://www.phonepe.com/" : "";
+      if (fallbackUrl) {
+        window.open(fallbackUrl, "_blank");
+        setMessage({
+          text: `Opening ${appName} website. Please scan QR or pay manually.`,
+          type: "info",
+        });
+      } else {
+        setMessage({
+          text: "Desktop app links bypassed. Please complete payment using the master QR code below.",
+          type: "info",
+        });
+      }
     }
+  };
 
-    return; // stop further execution
-  }
-
-  // ✅ PHONEPE and OTHER APPS
-  let schemeBase;
-
-  if (appName === "PhonePe") {
-    schemeBase = "phonepe://pay?";
-  } else {
-    schemeBase = "upi://pay?";
-  }
-
-  const upiUrl = schemeBase + params.toString();
-
-  if (isMobileDevice()) {
-    console.log(`Trying to open ${appName}: ${upiUrl}`);
-
-    window.location.href = upiUrl;
-
-    // Fallback if app not found
-    setTimeout(() => {
-      setMessage({
-        text: `${appName} not detected. Opening website instead...`,
-        type: "info",
-      });
-
-      if (appName === "PhonePe")
-        window.open("https://www.phonepe.com/", "_blank");
-    }, 2500);
-
-    setMessage({
-      text: `Opening ${appName} app to pay ₹${formattedAmount}...`,
-      type: "info",
-    });
-  } else {
-    // ✅ Desktop Fallback
-    let fallbackUrl = "";
-
-    if (appName === "PhonePe") fallbackUrl = "https://www.phonepe.com/";
-
-    if (fallbackUrl) {
-      window.open(fallbackUrl, "_blank");
-      setMessage({
-        text: `Opening ${appName} website. Please scan QR or pay manually.`,
-        type: "info",
-      });
-    } else {
-      setMessage({
-        text: "Could not determine redirect URL.",
-        type: "error",
-      });
+  const GetUPI = async () => {
+    const res = await getRandomUPI();
+    if (res.success) {
+      setupiId(res?.data?.upiId || "Q065208051@ybl");
+      setPayeeName(res?.data?.payeeName || "Guest Name");
     }
-  }
-};
+  };
 
-const GetUPI=async()=>{ const res=await getRandomUPI();
-  console.log(res);
-  if(res.success){
-setupiId(res?.data?.upiId||"Q065208051@ybl")
-setPayeeName(res?.data?.payeeName||"Guest Name")
-  }
-}
   // 🚀 Initial setup
   useEffect(() => {
-   GetUPI();
+    GetUPI();
     getUserData();
     fetchQRCode();
-    setTimer(300);
   }, []);
 
-  // ⏱ Countdown effect
+  // ⏱ ✅ FIXED COUNTDOWN EFFECT: Structured clean tick parameters at exactly 1000ms execution frames
   useEffect(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+      setTimer((prev) => {
+        if (prev <= 1) {
+          // If interval window drops down to absolute zero limits, trigger reset events
+          GetUPI();
+          fetchQRCode();
+          return 300; // Reset state back to a full 5 minutes sequence map cleanly
+        }
+        return prev - 1;
+      });
+    }, 1000); // Enforced 1 second delay execution pacing token
 
-    return () => clearInterval(timerRef.current);
-  }, []);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []); // Bound strictly with empty anchors to prevent rerender execution cycles duplication
 
-  // 🔁 When timer hits 0, fetch new QR and reset timer
-  useEffect(() => {
-    if (timer === 0) {
-      GetUPI();
-      fetchQRCode(); // fetch new QR
-      setTimer(300); // restart countdown
-    }
-  }, [timer]);
-const minutes = Math.floor(timer / 60);
-const seconds = timer % 60;
-  // Inline styles
-  const containerStyle = {
-    marginTop: "10px",
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px",
-  };
+  const minutes = Math.floor(timer / 60);
+  const seconds = timer % 60;
 
-  const itemStyle = {
-    backgroundColor: "#F4F4F5",
-    padding: "10px 12px",
-    borderRadius: "8px",
-    border: "1px solid #D1D1D6",
-    width: "48%",
-    cursor: "pointer",
-  };
-
-  const innerFlex = { display: "flex", alignItems: "center", gap: "10px" };
-  const textStyle = { color: "#0F0F0F", fontSize: "12px", fontWeight: 500 };
-  const imageStyle = { width: "24px", height: "auto" };
-
-  // 🧾 Submit UTR
   const handleSubmit = async (e) => {
     e.preventDefault();
-     if (isLoading) return;
+    if (isLoading) return;
     setIsLoading(true);
 
     setMessage({ text: "Submitting UTR for verification...", type: "info" });
     try {
       const payload = { userId: user?._id, amount: price, utr, qrImageName };
-   
       const res = await RechargeBalence(payload);
 
       if (!res.status) throw new Error("Payment request failed");
 
       setMessage({
-        text: "Payment submitted successfully! Awaiting approval.",
+        text: "Payment submitted successfully! Awaiting manual ledger confirmation.",
         type: "success",
       });
       setUtr("");
-      setTimeout(() => navigate(-1), 1000);
+      setTimeout(() => navigate(-1), 1200);
     } catch (error) {
       setMessage({
-        text: `Submission failed: ${error.message || "Server error."}`,
+        text: `Submission failed: ${error.message || "Server verification error."}`,
         type: "error",
       });
     } finally {
@@ -293,21 +242,20 @@ const seconds = timer % 60;
     }
   };
 
-  // ✅ Message component
   const MessageDisplay = ({ text, type }) => {
     if (!text) return null;
     let icon, cssClass;
     switch (type) {
       case "success":
-        icon = <CheckCircle />;
+        icon = <CheckCircle size={16} />;
         cssClass = "msg success";
         break;
       case "error":
-        icon = <AlertTriangle />;
+        icon = <AlertTriangle size={16} />;
         cssClass = "msg error";
         break;
       default:
-        icon = <Smile />;
+        icon = <Smile size={16} />;
         cssClass = "msg info";
     }
     return (
@@ -319,111 +267,112 @@ const seconds = timer % 60;
   };
 
   return (
-    <div className="pay-container">
-       <div className="header2">
-              <button className="back-btnR" onClick={() => navigate(-1)}>
-                <ArrowLeft color="black" />
-              </button>
-              <h1 className="header-title">Recharge</h1>
-              <div className="spacer"></div>
+    <div className="pay-viewport">
+      <div className="header2">
+        <button className="back-btnR" onClick={() => navigate(-1)}>
+          <ArrowLeft color="#ffffff" />
+        </button>
+        <h1 className="header-title">Checkout Gateway</h1>
+        <div className="spacer"></div>
+      </div>
+
+      <div className="main-pay-layout">
+        <div className="pay-card glass-panel">
+          
+          <header className="pay-header">
+            <span className="pay-header-lbl">Order Pay Amount</span>
+            <h3>₹{Number(price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h3>
+          </header>
+
+          <div className="intent-gateway-channels-container">
+            <div className="intent-channel-item" onClick={() => initiatePayment("Paytm")}>
+              <div className="channel-inner-flex">
+                <img
+                  src="https://img.icons8.com/?size=100&id=zB8j6RfneRmV&format=png&color=000000"
+                  alt="Paytm"
+                  className="channel-icon-vector"
+                />
+                <p className="channel-lbl-txt">Pay via Paytm</p>
+              </div>
             </div>
 
-      <div className="pay-card">
-        <header className="pay-header">
-          <h3>₹{price}</h3>
-        </header>
-
-     <div style={containerStyle}>
-  <div style={itemStyle} onClick={() => initiatePayment("Paytm")}>
-    <div style={innerFlex}>
-      <img
-        src="https://img.icons8.com/?size=100&id=zB8j6RfneRmV&format=png&color=000000"
-        alt="Paytm"
-        style={imageStyle}
-      />
-      <p style={textStyle}>Paytm</p>
-    </div>
-  </div>
-
-  <div style={itemStyle} onClick={() => initiatePayment("PhonePe")}>
-    <div style={innerFlex}>
-      <img
-        src="https://img.icons8.com/?size=100&id=OYtBxIlJwMGA&format=png&color=000000"
-        alt="PhonePe"
-        style={imageStyle}
-      />
-      <p style={textStyle}>PhonePe</p>
-    </div>
-  </div>
-</div>
-
-
-        {/* QR Section */}
-        <section className="qr-section">
-          <h2>Use Mobile Scan Code to Pay</h2>
-          <p>
-            Or take screenshot and scan in your payment app.
-            <br />
-            <Clock size={14} style={{ marginRight: 4 }} />
-            QR will expire in <strong>{minutes}:{seconds.toString().padStart(2, "0")} Minutes Left</strong>
-          </p>
-
-          <div className="qr-box">
-            {isLoading && !qrCodeUrl ? (
-              <div className="qr-loading">
-                <Loader2 className="spin" />
-                <p>Loading QR...</p>
-              </div>
-            ) : (
-              qrCodeUrl && (
+            <div className="intent-channel-item" onClick={() => initiatePayment("PhonePe")}>
+              <div className="channel-inner-flex">
                 <img
-                  src={qrCodeUrl}
-                  alt="QR Code"
-                  onError={(e) => {
-                    e.target.src =
-                      "https://placehold.co/160x160/F7F7F7/333333?text=QR+Error";
-                  }}
+                  src="https://img.icons8.com/?size=100&id=OYtBxIlJwMGA&format=png&color=000000"
+                  alt="PhonePe"
+                  className="channel-icon-vector"
                 />
-              )
-            )}
-          </div>
-
-          <div className="qr-warning">
-            ⚠️ Do not use the same QR code multiple times
-            
-            
-          </div>
-      
-          {isLoading && !qrCodeUrl ? (
-              <div className="qr-loading">
-                <Loader2 className="spin" />
-                <p>Loading QR...</p>
+                <p className="channel-lbl-txt">Pay via PhonePe</p>
               </div>
-            ):(<span>UPI Id: {upiId}</span>)}
-        </section>
+            </div>
+          </div>
 
-        {/* UTR Section */}
-        <section className="utr-section">
-          <h3>Enter Ref No. and Submit</h3>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={utr}
-              onChange={(e) => setUtr(e.target.value)}
-              placeholder="Enter Your UTR..."
-              required
-              disabled={isLoading || message.type === "success"}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !utr.trim() || message.type === "success"}
-            >
-              {isLoading ? <Loader2 className="spin" /> : "Submit"}
-            </button>
-          </form>
+          <section className="qr-section">
+            <h2>Scan Merchant QR to Complete Payment</h2>
+            <p className="qr-notice-para">
+              Take a screenshot to import into your preferred payment application.
+            </p>
+            
+            <div className="countdown-ticker-pill">
+              <Clock size={14} className="timer-icon-pulse" />
+              <span>Expires in: <strong>{minutes}:{seconds.toString().padStart(2, "0")} Mins Left</strong></span>
+            </div>
 
-          <MessageDisplay text={message.text} type={message.type} />
-        </section>
+            <div className="qr-box-wrapper">
+              {isLoading && !qrCodeUrl ? (
+                <div className="qr-loading-shimmer">
+                  <Loader2 className="spin-animation-loop" />
+                  <p>Generating dynamic merchant QR node...</p>
+                </div>
+              ) : (
+                qrCodeUrl && (
+                  <img
+                    src={qrCodeUrl}
+                    alt="Secure Matrix QR Code"
+                    className="core-qr-image"
+                    onError={(e) => {
+                      e.target.src = "https://placehold.co/200x200/13101d/ffffff?text=QR+Load+Error";
+                    }}
+                  />
+                )
+              )}
+            </div>
+
+            <div className="qr-warning-banner-text">
+              ⚠️ Warning: Single-use QR string. Do not pay multiple times using the same code snippet.
+            </div>
+{/*             
+            <div className="manual-upi-string-pill">
+              <span className="upi-lbl">VPA String:</span>
+              <span className="upi-val-text">{upiId || "Loading routing address..."}</span>
+            </div> */}
+          </section>
+
+          <section className="utr-section">
+            <h3>Enter 12-Digit UPI Ref / UTR Number</h3>
+            <form onSubmit={handleSubmit} className="utr-form-matrix">
+              <input
+                type="text"
+                value={utr}
+                onChange={(e) => setUtr(e.target.value)}
+                placeholder="Enter Transaction UTR (e.g., 6134...)"
+                maxLength="12"
+                required
+                className="utr-text-field"
+                disabled={isLoading || message.type === "success"}
+              />
+              <button
+                type="submit"
+                className="utr-submit-action-btn"
+                disabled={isLoading || !utr.trim() || message.type === "success"}
+              >
+                {isLoading ? <Loader2 className="spin-animation-loop" /> : "Submit"}
+              </button>
+            </form>
+          </section>
+
+        </div>
       </div>
     </div>
   );

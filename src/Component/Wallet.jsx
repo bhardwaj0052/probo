@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import './Wallet.css';
-
-// ✅ UNIFIED: Uses your updated profile reader method
-import { getuserData, getUserStatementHistory } from '../Api';
+import { getuserData, getUserStatementHistory } from '../api';
 
 export default function Wallet() {
   const navigate = useNavigate();
@@ -20,8 +18,8 @@ export default function Wallet() {
   const [loadingTransactions, setLoadingTransactions] = useState(true);
 
   const handleLogout = () => {
-    Cookies.remove("proboWeb", { path: "/" });
-    Cookies.remove("proboWebUser", { path: "/" });
+    Cookies.remove("2ndtredingWeb", { path: "/" });
+    Cookies.remove("2ndtredingWebUser", { path: "/" });
     localStorage.clear();
     navigate("/auth");
   };
@@ -110,7 +108,7 @@ export default function Wallet() {
   useEffect(() => {
     const localLoginFlag = localStorage.getItem('isLoggedIn');
     const savedUserId = localStorage.getItem('userId');
-    const token = localStorage.getItem('auth_token') || Cookies.get('proboWebUser');
+    const token = localStorage.getItem('auth_token') || Cookies.get('2ndtredingWeb');
 
     if (token && (localLoginFlag === "true" || savedUserId)) {
       setUserId(savedUserId);

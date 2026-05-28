@@ -1,299 +1,249 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-* {
-  font-family: 'Instrument Sans', sans-serif;
-  margin: 0;
-  padding: 0;
+.recharge-container {
+  min-height: 100vh;
+  background-color: #0b0813; /* Dynamic Dark Core Theme Background */
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  position: relative;
+  width: 100%;
+}
+
+/* Header Navbar matching DebateHub Premium styling blueprints */
+.header2 {
+  position: relative;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, #915EFF 0%, rgba(11, 8, 19, 0.95) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   box-sizing: border-box;
 }
 
-/* --- Global Container & Background --- */
-.recharge-container {
-   background: #ffffff;
-overflow: hidden;
-  animation: bgFlow 10s infinite alternate;
-  min-height: 100vh;
-  max-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
- 
-  
+.header-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  flex: 1;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
 
- }
+.spacer {
+  width: 2.5rem;
+}
 
-/* --- Header --- */
-.recharge-header {
-  width: 100%;
+/* Custom Back Button Circle Icon Layout */
+.back-btnR {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 25px;
-  color: #333; 
-  z-index: 10; 
-}
-
-.back-btnR {
-  background: transparent;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: #333;
-  transition: transform 0.2s ease;
-  padding: 0; 
-  display: flex;
-  align-items: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .back-btnR:hover {
-  transform: translateX(-4px);
-  color: #000;
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(-2px);
 }
 
-.recharge-header h2 {
-  font-size: 22px;
-  font-weight: 700;
-  align-items: center;
-  justify-content: center;
+/* Main content structural layout */
+.main-content-recharge {
   position: relative;
+  z-index: 10;
+  margin: 2rem auto 0 auto;
+  max-width: 580px;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
-/* --- Recharge Box (The Main Card) --- */
-.recharge-box {
- width: 100%;
-
-   max-height: 85vh;
-  margin: 0 auto;
-  min-height: 80vh;
-  background: #ffffff;
-  border-radius: 20px; 
-  padding: 30px 25px;
-
-  
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  margin-top: 10px;
-   overflow: scroll;
+/* Recharge Glassmorphism Container Card */
+.recharge-box.glass-panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(145, 94, 255, 0.15);
+  backdrop-filter: blur(16px);
+  padding: 2.25rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
 
-/* --- Illustration Placeholder (New element based on image) --- */
-/* You'll need to add a div or image element in your React component for this. */
-/* If you can't modify the HTML, this is just a comment. */
-/* Assuming you add a div with class .illustration-placeholder */
-/*
-.illustration-placeholder {
-  position: absolute;
-  top: 5px;
-  right: 20px;
-  width: 100px; 
-  height: 100px; 
-  background-image: url('illustration-path.png'); 
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.8;
-  z-index: 1; 
+.input-block-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1.75rem;
 }
-*/
 
-/* --- Input Area --- */
 .label1 {
-  font-weight: 600;
-  margin-bottom: 12px;
-  display: block;
-  font-size: 16px;
-  color: #333;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Input Fields Wrapper Framework */
+.recharge-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.recharge-currency-symbol {
+  position: absolute;
+  left: 1.25rem;
+  color: #915EFF;
+  font-size: 1.5rem;
+  font-weight: 700;
+  pointer-events: none;
 }
 
 .amount-input {
   width: 100%;
-  padding: 16px;
-  border: 1px solid #ccc; /* Lighter border */
-  border-radius: 10px;
-  font-size: 16px;
-  margin-bottom: 25px;
-  /* Use the lighter color scheme from the image for focus */
-  transition: border 0.3s ease, box-shadow 0.3s ease;
+  padding: 1.1rem 1rem 1.1rem 2.75rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  letter-spacing: 0.02em;
 }
 
 .amount-input:focus {
-  border-color: #ff9800; /* Orange border on focus */
-  box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
-  outline: none;
+  border-color: #915EFF;
+  box-shadow: 0 0 0 3px rgba(145, 94, 255, 0.25);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* --- Quick Amounts --- */
+.amount-input::placeholder {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+/* Quick amounts chip selection section grids */
+.quick-amounts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 2.25rem;
+}
+
+.section-mini-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #915EFF;
+  letter-spacing: 0.02em;
+}
+
 .quick-amounts {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 30px;
-  /* Add a distinct section background and padding like the image */
-  background: #f7f7f7;
-  padding: 20px;
-  border-radius: 15px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
 .quick-btn {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 12px 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.75rem 0.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
 }
 
-.quick-btn:hover,
-.quick-btn.selected {
-  /* Use the orange/yellow primary color for selection */
-  background: #ff9800;
-  border: 1px solid #ff9800;
+.quick-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
-  transform: scale(1.02);
-  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
+  border-color: rgba(145, 94, 255, 0.3);
 }
 
-/* --- Channels Section --- */
-.channels {
-  display: flex;
-  flex-direction: column; /* Stack vertically as in the image */
-  gap: 15px;
-  margin-bottom: 30px;
-  padding-top: 20px; /* Space from previous section */
-  border-top: 1px solid #eee; /* Subtle separator line */
+/* Selected chip accent state configuration */
+.quick-btn.selected {
+  background: rgba(145, 94, 255, 0.15);
+  border-color: #915EFF;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(145, 94, 255, 0.2);
 }
 
-/* New CSS for a radio-button style look */
-.channel-btn {
-  width: 100%;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 16px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  transition: 0.3s;
-  text-align: left;
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.channel-btn:hover {
-  border-color: #ff9800;
-  transform: none; /* Removed vertical transform */
-}
-
-.channel-btn.selected {
-  border-color: #ff9800;
-  background: #fff8f0; /* Very light orange background for selection */
-}
-
-/* Radio button circle style for channels */
-.channel-btn::after {
-  content: '';
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-  display: inline-block;
-}
-
-.channel-btn.selected::after {
-  border-color: #ff9800;
-  background-color: #ff9800;
-  box-shadow: inset 0 0 0 4px #ffffff; /* Inner white circle */
-}
-
-/* --- Explain Box --- */
-.explain-box {
-  /* Match the light yellow/orange background from the image */
-  background: #fff3e0;
-  border-radius: 12px;
-  padding: 20px;
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 25px;
-  border-left: 5px solid #ff9800; /* A distinct left border */
-}
-
-.explain-box h3 {
-  font-size: 18px;
-  margin-bottom: 10px;
-  font-weight: 700;
-  color: #333;
-}
-
-.explain-box ol {
-  padding-left: 20px;
-}
-
-.explain-box li {
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-/* --- Recharge Button --- */
+/* Main Action Submit Button */
 .recharge-btn {
-  width: 40%;
-  padding: 18px;
-  background: #ff9800;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #915EFF 0%, #763af5 100%);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.05rem;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(145, 94, 255, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
-  border-radius: 12px;
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
   cursor: pointer;
- 
-  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
-
-  display: block;      /* ensures it's a block element */
-  margin: 20px auto;   /* centers horizontally */
+  letter-spacing: 0.01em;
 }
-
 
 .recharge-btn:hover {
-  background: #e68900;
- 
-  box-shadow: 0 8px 18px rgba(255, 152, 0, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(145, 94, 255, 0.5);
+  filter: brightness(1.1);
 }
 
-/* --- Existing Animations (kept for completeness) --- */
-@keyframes slideUp {
-  from {
-    transform: translateY(40px);
-    opacity: 0;
-  }
+/* Guidelines Text Document Blocks */
+.explain-box {
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
+.explain-title {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 0.85rem 0;
+  letter-spacing: -0.01em;
+}
+
+.explain-rules-list {
+  list-style-type: decimal;
+  list-style-position: inside;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+}
+
+.explain-rules-list li {
+  line-height: 1.45;
+}
+
+/* Responsive adjustment rules for mobile displays sizes */
+@media (max-width: 480px) {
+  .quick-amounts {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .recharge-box.glass-panel {
+    padding: 1.5rem;
   }
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-30px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+/* Clean up input numerical type indicator fields native controls pointers */
+.amount-input::-webkit-outer-spin-button,
+.amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
