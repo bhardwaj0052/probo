@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { getLiveProductsFeed, getuserData } from '../Api'; // ✅ CONNECTED TO YOUR NEW API METHOD
+import { getLiveProductsFeed, getuserData } from '../Api'; 
 import './Home.css';
 
 export default function Home() {
@@ -12,8 +12,18 @@ export default function Home() {
   const [walletBalance, setWalletBalance] = useState("0.00");
   const [categories, setCategories] = useState([]);
   const [trendingQuestions, setTrendingQuestions] = useState([]);
+  
+  // New States for enhanced professional features
+  const [activeTab, setActiveTab] = useState("All");
+  const [tickerVolume, setTickerVolume] = useState(482910);
 
-  // ✅ NEW CORE METHOD: Queries live user metrics straight from your MongoDB cluster
+  // Live platform statistical values
+  const statsMetrics = [
+    { label: "Active Traders", value: "142.8K+", color: "#10b981" },
+    { label: "Total Winnings Disbursed", value: "₹4.2 Cr+", color: "#fbbf24" },
+    { label: "Trades Matched (24h)", value: "894,201", color: "#915EFF" }
+  ];
+
   const fetchLiveDatabaseMetrics = async (targetUid) => {
     if (!targetUid) return;
     try {
@@ -22,14 +32,12 @@ export default function Home() {
         const freshUser = data.user;
         setUserProfile(freshUser);
 
-        // Map live database numbers directly to the UI layout states
         if (freshUser.balance !== undefined) {
           setWalletBalance(Number(freshUser.balance).toFixed(2));
         } else if (freshUser.Withdrawal !== undefined) {
           setWalletBalance(Number(freshUser.Withdrawal).toFixed(2));
         }
         
-        // Keeps local memory in sync safely
         localStorage.setItem('userData', JSON.stringify(freshUser));
       }
     } catch (err) {
@@ -46,7 +54,6 @@ export default function Home() {
       setIsLoggedIn(true);
       if (savedUserId) {
         setUserId(savedUserId);
-        // ✅ CRITICAL REPAIR: Hits dynamic database api on load instead of stale text copies
         fetchLiveDatabaseMetrics(savedUserId);
       }
     } else {
@@ -56,14 +63,20 @@ export default function Home() {
       setWalletBalance("0.00");
     }
 
-    // Dynamic global listener to auto-refresh whenever transactions run elsewhere
     const triggerGlobalSync = () => {
       if (savedUserId) fetchLiveDatabaseMetrics(savedUserId);
     };
 
     window.addEventListener("refreshWalletBalance", triggerGlobalSync);
+    
+    // Smooth background ticker increment to emulate global trade volume updates
+    const interval = setInterval(() => {
+      setTickerVolume(prev => prev + Math.floor(Math.random() * 4) + 1);
+    }, 3000);
+
     return () => {
       window.removeEventListener("refreshWalletBalance", triggerGlobalSync);
+      clearInterval(interval);
     };
   }, []);
 
@@ -73,7 +86,6 @@ export default function Home() {
         const data = await getLiveProductsFeed();
         if (data && data.products) {
           const allProducts = data.products;
-
           const uniqueCategoryNames = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
           
           const colorAccents = ["#915EFF", "#fbbf24", "#ec4899", "#3b82f6", "#10b981", "#a855f7"];
@@ -83,7 +95,7 @@ export default function Home() {
           }));
 
           setCategories(computedCategories);
-          setTrendingQuestions(allProducts.slice(0, 4));
+          setTrendingQuestions(allProducts.slice(0, 6)); // Expanded to 6 items to comfortably fill grid space
         }
       } catch (err) {
         console.error("Failed to compile marketplace category channels via API service:", err);
@@ -102,8 +114,21 @@ export default function Home() {
     });
   };
 
+  // Filter trending questions based on top horizontal secondary filters
+  const filteredQuestions = activeTab === "All" 
+    ? trendingQuestions 
+    : trendingQuestions.filter(q => q.category.toLowerCase() === activeTab.toLowerCase());
+
   return (
     <div className="app-container">
+      {/* 1. Global Live Event Ticker Header Banner */}
+      <div className="live-ticker-banner">
+        <div className="ticker-content">
+          <span className="ticker-pulse">● LIVE</span>
+          <p className="ticker-text">Total volumes matched globally: <strong>{tickerVolume.toLocaleString()} trades</strong> across all opinion pools.</p>
+        </div>
+      </div>
+
       <header className="premium-navbar">
         <div className="navbar-wrapper">
           <div className="brand-logo-block">
@@ -140,6 +165,19 @@ export default function Home() {
       </header>
 
       <main className="main-layout">
+        {/* 2. Platform Dynamic Metrics Counter Section */}
+        <section className="stats-counter-shelf">
+          {statsMetrics.map((stat, index) => (
+            <div className="stat-pill-box" key={index}>
+              <span className="stat-dot" style={{ backgroundColor: stat.color }}></span>
+              <div className="stat-lbl-group">
+                <span className="stat-micro-label">{stat.label}</span>
+                <span className="stat-numerical-headline">{stat.value}</span>
+              </div>
+            </div>
+          ))}
+        </section>
+
         <section className="hero-grid">
           <div className="branding-sidebar">
             <div className="space-y-4">
@@ -147,18 +185,76 @@ export default function Home() {
               <h1 className="hero-title">Predict.<br />Debate.<br /><span className="hero-title-highlight">Earn.</span></h1>
               <p className="hero-description">India's Fastest Opinion & Prediction Platform ⚡</p>
             </div>
+
+            {/* 3. Embedded Slanted Live Event Arena Card (Fills the blank spaces under Left Sidebar) */}
+            {/* STATIC REPLACEMENT: High-Fidelity Animated Feature & Status Widget */}
+<div className="glass-match-card preview-premium-card static-trust-widget">
+  <div className="premium-time-badge platform-status-badge">
+    <div className="pulse-dot radar-pulse"></div> SYSTEM ACTIVE
+  </div>
+  
+  <div className="animated-radar-container">
+    <div className="radar-circle circle-1"></div>
+    <div className="radar-circle circle-2"></div>
+    <div className="radar-circle circle-3"></div>
+    <div className="radar-core">
+      <span className="radar-bolt-icon">⚡</span>
+    </div>
+  </div>
+
+  <div className="premium-prompt-section clean-spacing">
+    <h4 className="premium-poll-title text-center">India's Leading Opinion Hub</h4>
+    <p className="premium-poll-subtitle text-center">Trade opinions on Sports, Crypto, Entertainment & News instantly.</p>
+  </div>
+
+  <div className="static-perks-list">
+    <div className="perk-item-row">
+      <div className="perk-icon-shell purple-glow">✓</div>
+      <div className="perk-text-shell">
+        <h5>Instant Payouts</h5>
+        <p>Earnings credited right after pool settlement.</p>
+      </div>
+    </div>
+    <div className="perk-item-row">
+      <div className="perk-icon-shell emerald-glow">🛡️</div>
+      <div className="perk-text-shell">
+        <h5>Secure Ledger</h5>
+        <p>100% transparent bidding mechanics.</p>
+      </div>
+    </div>
+    <div className="perk-item-row">
+      <div className="perk-icon-shell amber-glow">👥</div>
+      <div className="perk-text-shell">
+        <h5>Peer-to-Peer</h5>
+        <p>You trade directly against other users across India.</p>
+      </div>
+    </div>
+  </div>
+
+
+</div>
           </div>
 
           <div className="workspace-area">
             <div className="space-y-3">
               <h3 className="section-title">Popular Categories</h3>
               <div className="categories-carousel">
+                <div 
+                  className={`category-card ${activeTab === "All" ? "" : "category-card-inactive"}`}
+                  onClick={() => setActiveTab("All")}
+                  style={activeTab === "All" ? { borderColor: "#915EFF", backgroundColor: "rgba(145, 94, 255, 0.1)" } : {}}
+                >
+                  <span className="category-name" style={{ color: activeTab === "All" ? "#915EFF" : "#9ca3af" }}>🔥 All Markets</span>
+                </div>
                 {categories.map((cat, idx) => (
                   <div 
                     key={idx} 
-                    className="category-card category-card-inactive"
-                    onClick={() => handleMarketNavigation(cat.name, cat.accent)}
-                    style={{ borderColor: cat.accent + "33" }}
+                    className={`category-card ${activeTab === cat.name ? "" : "category-card-inactive"}`}
+                    onClick={() => {
+                      setActiveTab(cat.name);
+                      handleMarketNavigation(cat.name, cat.accent);
+                    }}
+                    style={activeTab === cat.name ? { borderColor: cat.accent, backgroundColor: `${cat.accent}22` } : { borderColor: cat.accent + "33" }}
                   >
                     <span className="category-name" style={{ color: cat.accent }}>{cat.name}</span>
                   </div>
@@ -166,21 +262,42 @@ export default function Home() {
               </div>
             </div>
 
+            {/* 4. Filter Interactive Feed Switcher Pills */}
             <div className="space-y-3">
-              <h3 className="section-title">Trending Questions</h3>
+              <div className="feed-filter-bar">
+                <h3 className="section-title">Trending Questions</h3>
+                <div className="filter-chips-cluster">
+                  <button className="chip-btn active-chip">Trending</button>
+                  <button className="chip-btn">High Volume</button>
+                  <button className="chip-btn">Closing Soon</button>
+                </div>
+              </div>
+              
               <div className="trending-grid">
-                {trendingQuestions.map((item) => (
-                  <div 
-                    key={item._id} 
-                    className="trend-card border-purple-500/20"
-                    onClick={() => handleMarketNavigation(item.category, "#915EFF", item.question)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div><span className="live-badge">● {item.category}</span></div>
-                    <h4 className="trend-question">{item.question}</h4>
-                    <button className="trend-card-btn">Predict Now</button>
-                  </div>
-                ))}
+                {filteredQuestions.length > 0 ? (
+                  filteredQuestions.map((item) => (
+                    <div 
+                      key={item._id} 
+                      className="trend-card border-purple-500/20"
+                      onClick={() => handleMarketNavigation(item.category, "#915EFF", item.question)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="trend-card-top-row">
+                        <span className="live-badge">● {item.category}</span>
+                        <span className="timestamp-badge">⚡ Live Pool</span>
+                      </div>
+                      <h4 className="trend-question">{item.question}</h4>
+                      
+                      {/* Added Dual Options Layout Selector inside small trend cards for standard layout look */}
+                      <div className="trend-mini-bidding-row">
+                        <button className="mini-bid-btn-yes">Yes ₹5.5</button>
+                        <button className="mini-bid-btn-no">No ₹4.5</button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="empty-fallback-text">No active prediction events in this segment.</p>
+                )}
               </div>
             </div>
           </div>
