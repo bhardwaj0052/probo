@@ -17,6 +17,8 @@ export default function Categories() {
   const [activeSubCat, setActiveSubCat] = useState('All');
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   // Global language toggle state matrix ('EN' | 'HI')
   const [currentLang, setCurrentLang] = useState('EN');
@@ -87,6 +89,20 @@ export default function Categories() {
 
     return matchesSubCat && matchesLang;
   });
+
+  const totalPages = Math.max(1, Math.ceil(displayedQuestions.length / itemsPerPage));
+  const pagedQuestions = displayedQuestions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeSubCat, currentLang, allCategoryProducts]);
+
+  const handlePageChange = (direction) => {
+    setCurrentPage((prevPage) => {
+      const nextPage = prevPage + direction;
+      return Math.min(Math.max(nextPage, 1), totalPages);
+    });
+  };
 
   // 4️⃣ Centralized Inline Staking Trade Placement Pipeline Handlers
   const handleTradeExecution = async (tradePayload) => {
@@ -196,16 +212,44 @@ export default function Categories() {
               <p>No active pools open in {currentLang === 'EN' ? 'English' : 'हिंदी'} under "{activeSubCat}" right now.</p>
             </div>
           ) : (
-            <div className="subcat-vertical-cards-list">
-              {displayedQuestions.map((item) => (
-                <div key={item._id?.$oid || item._id} className="list-item-card-wrapper">
-                  <TradeCard 
-                    product={item}
-                    onPlaceTrade={handleTradeExecution}
-                  />
+            <>
+              <div className="subcat-vertical-cards-list">
+                {pagedQuestions.map((item) => (
+                  <div key={item._id?.$oid || item._id} className="list-item-card-wrapper">
+                    <TradeCard 
+                      product={item}
+                      onPlaceTrade={handleTradeExecution}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {displayedQuestions.length > itemsPerPage && (
+                <div className="pagination-controls">
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => handlePageChange(-1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+
+                  <div className="pagination-info">
+                    Page {currentPage} of {totalPages}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </section>
       </main>

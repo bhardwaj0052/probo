@@ -14,6 +14,8 @@ export default function Rewards() {
   const [withdrawableBalance, setWithdrawableBalance] = useState("0.00");
   const [liveInPlayBalance, setLiveInPlayBalance] = useState(0);
   const [totalWonCash, setTotalWonCash] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   // Filters setup to map against database string configurations
   const filters = ['All', 'pending', 'win', 'loss'];
@@ -77,6 +79,20 @@ export default function Rewards() {
   const filteredTrades = activeFilter === 'All'
     ? trades
     : trades.filter(item => item.winningStatus === activeFilter);
+
+  const totalPages = Math.max(1, Math.ceil(filteredTrades.length / itemsPerPage));
+  const pagedTrades = filteredTrades.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeFilter, trades]);
+
+  const handleRewardsPageChange = (direction) => {
+    setCurrentPage((prevPage) => {
+      const nextPage = prevPage + direction;
+      return Math.min(Math.max(nextPage, 1), totalPages);
+    });
+  };
 
   // Status mapping display parser configuration text helpers
   const getDisplayStatusLabel = (status) => {
@@ -160,9 +176,10 @@ export default function Rewards() {
               <span className="empty-state-icon-lbl">📋 No trade positions matching "{getDisplayStatusLabel(activeFilter)}" registered inside this node profile matrix.</span>
             </div>
           ) : (
-            <div className="rewards-grid">
-              {filteredTrades.map((trade) => (
-                <div key={trade._id} className="reward-card bg-brand-card">
+            <>
+              <div className="rewards-grid">
+                {pagedTrades.map((trade) => (
+                  <div key={trade._id} className="reward-card bg-brand-card">
                   
                   <div className="reward-card-top">
                     <div className="reward-brand-identity">
@@ -209,7 +226,7 @@ export default function Rewards() {
                         }`}>
                           {trade.winningStatus === 'loss' ? '₹0.00' : 
                            `₹${trade.winningStatus === 'pending' 
-                              ? (trade.investmentAmount * 1.8).toFixed(2) 
+                              ? (trade.investmentAmount * 1.5).toFixed(2) 
                               : Number(trade.payoutAmount || 0).toFixed(2)}`
                           }
                         </span>
@@ -219,10 +236,36 @@ export default function Rewards() {
 
                 </div>
               ))}
-            </div>
-          )}
-        </section>
+              </div>
 
+              {filteredTrades.length > itemsPerPage && (
+                <div className="pagination-controls rewards-pagination-controls">
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => handleRewardsPageChange(-1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+
+                  <div className="pagination-info">
+                    Page {currentPage} of {totalPages}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => handleRewardsPageChange(1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+          </section>
       </main>
     </div>
   );

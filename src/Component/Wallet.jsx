@@ -16,6 +16,8 @@ export default function Wallet() {
 
   const [ledgerTransactions, setLedgerTransactions] = useState([]);
   const [loadingTransactions, setLoadingTransactions] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleLogout = () => {
     Cookies.remove("2ndtredingWeb", { path: "/" });
@@ -123,6 +125,20 @@ export default function Wallet() {
     ? ledgerTransactions 
     : ledgerTransactions.filter(txn => txn.type === activeTab);
 
+  const totalPages = Math.max(1, Math.ceil(filteredTxns.length / itemsPerPage));
+  const pagedTxns = filteredTxns.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, ledgerTransactions]);
+
+  const handleWalletPageChange = (direction) => {
+    setCurrentPage((prevPage) => {
+      const nextPage = prevPage + direction;
+      return Math.min(Math.max(nextPage, 1), totalPages);
+    });
+  };
+
   return (
     <div className="wallet-page-container">
       <header className="wallet-page-header">
@@ -208,7 +224,7 @@ export default function Wallet() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTxns.map((txn, index) => (
+                  {pagedTxns.map((txn, index) => (
                     <tr key={`${txn.id}-${index}`}>
                       <td className="txn-id">{txn.id}</td>
                       <td className="txn-desc">{txn.desc}</td>
@@ -228,6 +244,32 @@ export default function Wallet() {
                   ))}
                 </tbody>
               </table>
+            )}
+
+            {filteredTxns.length > itemsPerPage && (
+              <div className="pagination-controls wallet-pagination-controls">
+                <button
+                  type="button"
+                  className="pagination-btn"
+                  onClick={() => handleWalletPageChange(-1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+
+                <div className="pagination-info">
+                  Page {currentPage} of {totalPages}
+                </div>
+
+                <button
+                  type="button"
+                  className="pagination-btn"
+                  onClick={() => handleWalletPageChange(1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
             )}
           </div>
         </section>
