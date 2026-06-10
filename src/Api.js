@@ -224,3 +224,15 @@ export const getuserData = async (userId)=>{
     console.log(error)
   }
 }
+
+export const getcatgory= async()=>{
+  try {
+    const res =await axios.get(`${API_BASE_URL}api/products/areas/all`); 
+    console.log(res.data);
+    return res.data;
+    
+  }
+    catch (error) { 
+      console.log(error)
+    } 
+}
