@@ -47,20 +47,39 @@ export default function Rewards() {
       const purchaseRes = await getUserPurchaseHistory(savedUserId);
       if (purchaseRes && purchaseRes.success) {
         const rawPurchasesList = purchaseRes.purchases || [];
-        setTrades(rawPurchasesList);
 
-        // Dynamically compute runtime summary panels stats indicators straight from database
         let inPlayAccumulator = 0;
         let wonAccumulator = 0;
 
-        rawPurchasesList.forEach((trade) => {
-          if (trade.winningStatus === 'pending') {
-            inPlayAccumulator += Number(trade.investmentAmount || 0);
-          } else if (trade.winningStatus === 'win') {
-            wonAccumulator += Number(trade.payoutAmount || 0);
+        // Map to a clean secondary array container to force React rendering cycles to pick up changes
+        const processedTradesList = rawPurchasesList.map((trade) => {
+          const updatedTrade = { ...trade };
+
+          if (updatedTrade.winningStatus === 'pending') {
+            const investment = Number(updatedTrade.investmentAmount || 0);
+            // 🚀 FIXED KEY MATCHING: Direct pairing with your exact schema property definition
+            const rewardPercentageField = Number(updatedTrade.rewardPercentage || 0);
+            
+            // Progressive Bracket Scaling Logic Matrix Engine
+            let multiplier;
+            if (rewardPercentageField <= 100) {
+              multiplier = 1 + (rewardPercentageField / 100);
+            } else {
+              multiplier = 2 + ((rewardPercentageField - 100) * 0.02);
+            }
+
+            inPlayAccumulator += investment;
+            // Inject calculated field onto the localized object mapping instance
+            updatedTrade.calculatedEstimatedPayout = investment * multiplier;
+
+          } else if (updatedTrade.winningStatus === 'win') {
+            wonAccumulator += Number(updatedTrade.payoutAmount || 0);
           }
+
+          return updatedTrade;
         });
 
+        setTrades(processedTradesList);
         setLiveInPlayBalance(inPlayAccumulator);
         setTotalWonCash(wonAccumulator);
       }
@@ -108,11 +127,17 @@ export default function Rewards() {
 
   const getPayoutValue = (trade) => {
     const investment = Number(trade.investmentAmount || 0);
-    const backendPayout = Number(trade.payoutAmount ?? trade.estimatedPayout ?? 0);
+    const rewardPercentage = Number(trade.rewardPercentage);
 
     if (trade.winningStatus === 'pending') {
-      return `₹${backendPayout.toFixed(2)}`;
+      const multiplier = rewardPercentage <= 100
+        ? 1 + rewardPercentage / 100
+        : 2 + (rewardPercentage - 100) * 0.02;
+      const estimatedReturn = investment * multiplier;
+      return `₹${estimatedReturn.toFixed(2)}`;
     }
+
+    const backendPayout = Number(trade.payoutAmount ?? trade.calculatedEstimatedPayout ?? trade.estimatedPayout ?? 0);
 
     if (trade.winningStatus === 'loss') {
       const lossAmount = backendPayout !== 0 ? backendPayout : investment;
@@ -212,12 +237,11 @@ export default function Rewards() {
                       <span className="brand-avatar">📊</span>
                       
                       <div className="brand-title-meta">
-                        {/* Maps dynamic question string text natively from your document log layout keys */}
                         <h3 className="brand-name">{trade.question}</h3>
                         <span className="brand-type-badge">
-                          Invested On: {new Date(trade.investedAt).toLocaleDateString('en-IN', {
+                          Invested On: {trade.investedAt ? new Date(trade.investedAt).toLocaleDateString('en-IN', {
                             day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-                          })}
+                          }) : 'Recent'}
                         </span>
                       </div>
                     </div>
@@ -232,7 +256,6 @@ export default function Rewards() {
                   <div className="reward-card-bottom">
                     <div className="trade-position-details">
                       <span className="position-label">Your Backed Option Stance:</span>
-                      {/* Maps literal selected option string text parameters fields natively */}
                       <span className="position-value text-purple">{trade.option}</span>
                     </div>
 
@@ -254,7 +277,7 @@ export default function Rewards() {
                   </div>
 
                 </div>
-              ))}
+                ))}
               </div>
 
               {filteredTrades.length > itemsPerPage && (
