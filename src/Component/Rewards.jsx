@@ -102,6 +102,32 @@ export default function Rewards() {
     return status;
   };
 
+  const getPayoutLabel = (status) => {
+    return status === 'pending' ? 'Estimated Return' : 'Settled Balance Yield';
+  };
+
+  const getPayoutValue = (trade) => {
+    const investment = Number(trade.investmentAmount || 0);
+    const backendPayout = Number(trade.payoutAmount ?? trade.estimatedPayout ?? 0);
+
+    if (trade.winningStatus === 'pending') {
+      return `₹${backendPayout.toFixed(2)}`;
+    }
+
+    if (trade.winningStatus === 'loss') {
+      const lossAmount = backendPayout !== 0 ? backendPayout : investment;
+      return `-₹${Math.abs(lossAmount).toFixed(2)}`;
+    }
+
+    return `₹${backendPayout.toFixed(2)}`;
+  };
+
+  const getPayoutClass = (status) => {
+    if (status === 'win') return 'text-emerald';
+    if (status === 'loss') return 'text-gray';
+    return 'text-amber';
+  };
+
   return (
     <div className="rewards-container">
       
@@ -218,17 +244,10 @@ export default function Rewards() {
                       
                       <div className="metric-column text-right">
                         <span className="cost-label">
-                          {trade.winningStatus === 'pending' ? 'Estimated Return' : 'Settled Balance Yield'}
+                          {getPayoutLabel(trade.winningStatus)}
                         </span>
-                        <span className={`cost-rupees ${
-                          trade.winningStatus === 'win' ? 'text-emerald' : 
-                          trade.winningStatus === 'loss' ? 'text-gray' : 'text-amber'
-                        }`}>
-                          {trade.winningStatus === 'loss' ? '₹0.00' : 
-                           `₹${trade.winningStatus === 'pending' 
-                              ? (trade.investmentAmount * 1.5).toFixed(2) 
-                              : Number(trade.payoutAmount || 0).toFixed(2)}`
-                          }
+                        <span className={`cost-rupees ${getPayoutClass(trade.winningStatus)}`}>
+                          {getPayoutValue(trade)}
                         </span>
                       </div>
                     </div>
