@@ -19,21 +19,20 @@ export default function TradeCard({ product, onPlaceTrade }) {
     subCategory,
     options = [],
     initialThreshold = 0,
-    rewardPercentage = 0,
     endTime,
   } = product;
 
+  // 🚀 FIXED: Dynamic Multiplier Engine calculated on the currently SELECTED option's reward rate
   const investment = Number(investmentAmount) || 0;
-  const rewardPct = Number(rewardPercentage) || 0;
+  const currentRewardPct = Number(selectedOption?.rewardPercentage || 0);
 
   let multiplier;
-
-  if (rewardPct <= 100) {
-    // Tier 1: Standard linear scale for 0% to 100% (Handles 10%->1.1x, 50%->1.5x, 100%->2x)
-    multiplier = 1 + rewardPct / 100;
+  if (currentRewardPct <= 100) {
+    // Tier 1: Linear scale (e.g. 10% -> 1.1x, 100% -> 2x)
+    multiplier = 1 + currentRewardPct / 100;
   } else {
-    // Tier 2: Accelerated scale for over 100% (Smoothly scales from 2x up to exactly 4x at 200%)
-    multiplier = 2 + (rewardPct - 100) * 0.02;
+    // Tier 2: Accelerated scale for custom volatile targets
+    multiplier = 2 + (currentRewardPct - 100) * 0.02;
   }
 
   const calculativePayout = investment * multiplier;
@@ -91,7 +90,7 @@ export default function TradeCard({ product, onPlaceTrade }) {
         chosenOptionId: String(parsedOptionId),
         option: selectedOption.optionText,
         investmentAmount: Number(investmentAmount),
-        estimatedPayout: calculativePayout, // Passing the calculation down cleanly
+        estimatedPayout: calculativePayout, 
       });
     }
 
@@ -131,14 +130,14 @@ export default function TradeCard({ product, onPlaceTrade }) {
           </span>
         </div>
         <div className="meta-timer-tag">
-          ⏰ Ends in {formatRemaining(endTime)}
+          Time Remaining: {formatRemaining(endTime)}
         </div>
       </div>
 
       {/* CORE OPINION TOPIC */}
       <h3 className="card-question-text">{question}</h3>
 
-      {/* DYNAMIC MCQ CONFIGURABLE BUTTONS BLOCK */}
+      {/* 🚀 FIXED: MCQ Options buttons layout displaying individual percentages inside each node */}
       <div className="mcq-options-stack">
         {options.map((opt) => {
           const optIdString = opt._id?.$oid || opt._id;
@@ -147,8 +146,23 @@ export default function TradeCard({ product, onPlaceTrade }) {
               key={optIdString}
               className="mcq-option-row-btn"
               onClick={() => handleOptionSelect(opt)}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                width: "100%",
+                padding: "12px 16px",
+                marginBottom: "8px",
+                borderRadius: "8px",
+                cursor: "pointer"
+              }}
             >
-              <span className="option-text-lbl">{opt.optionText}</span>
+              <span className="option-text-lbl" style={{ fontWeight: "600" }}>
+                {opt.optionText}
+              </span>
+              <span className="option-percentage-tag" style={{ fontSize: "12px", opacity: 0.8, fontWeight: "700" }}>
+                Reward Percentage: {opt.rewardPercentage || 0}%
+              </span>
             </button>
           );
         })}
@@ -157,8 +171,7 @@ export default function TradeCard({ product, onPlaceTrade }) {
       {/* MINIMUM ENTRY STATUS COMPLIANCE FOOTER */}
       <div className="card-bottom-volume-bar">
         <span>
-          📋 Required Min Entry: ₹{initialThreshold} • Reward Percentage:{" "}
-          {rewardPercentage}%
+          📋 Required Min Entry: ₹{initialThreshold}
         </span>
       </div>
 
@@ -209,9 +222,9 @@ export default function TradeCard({ product, onPlaceTrade }) {
           {/* 🚀 NEW LIVE ESTIMATED PAYOUT SUB-MATRIX PANEL DISPLAY */}
           <div className="slip-payout-estimation-block">
             <div className="estimation-row">
-              <span className="estimation-lbl">Contract Reward Rate:</span>
+              <span className="estimation-lbl">Selected Option Rate:</span>
               <span className="estimation-val text-cyan">
-                {rewardPercentage}%
+                {currentRewardPct}%
               </span>
             </div>
             <div className="estimation-row structural-divider">
@@ -219,10 +232,9 @@ export default function TradeCard({ product, onPlaceTrade }) {
                 Potential Return Payout:
               </span>
               <span className="estimation-val highlight-payout-val">
-                ₹
                 {isNaN(calculativePayout)
-                  ? "0.00"
-                  : calculativePayout.toFixed(2)}
+                  ? "₹0.00"
+                  : `₹${calculativePayout.toFixed(2)}`}
               </span>
             </div>
           </div>
