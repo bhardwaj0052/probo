@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./TradeCard.css";
 
 export default function TradeCard({ product, onPlaceTrade }) {
@@ -9,6 +9,12 @@ export default function TradeCard({ product, onPlaceTrade }) {
   );
   const [showOrderSlip, setShowOrderSlip] = useState(false);
   const [inputError, setInputError] = useState("");
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  useEffect(() => {
+    const ticker = setInterval(() => setCurrentTime(Date.now()), 15000);
+    return () => clearInterval(ticker);
+  }, []);
 
   if (!product) return null;
 
@@ -20,6 +26,8 @@ export default function TradeCard({ product, onPlaceTrade }) {
     options = [],
     initialThreshold = 0,
     endTime,
+    status,
+    winningStatus,
   } = product;
 
   // 🚀 FIXED: Dynamic Multiplier Engine calculated on the currently SELECTED option's reward rate
@@ -37,7 +45,22 @@ export default function TradeCard({ product, onPlaceTrade }) {
 
   const calculativePayout = investment * multiplier;
 
+  const parsedEndTime = endTime ? new Date(endTime).getTime() : NaN;
+  const hasExpired = !isNaN(parsedEndTime) && parsedEndTime <= currentTime;
+  const closedByStatus = [
+    String(status || "").toLowerCase(),
+    String(winningStatus || "").toLowerCase(),
+  ].some((value) => ["closed", "settled", "ended", "resolved", "win", "loss"].includes(value));
+  const isMarketClosed = hasExpired || closedByStatus;
+
   const handleOptionSelect = (optionObj) => {
+    if (isMarketClosed) {
+      setInputError(
+        "This market has already closed and can no longer accept new buys.",
+      );
+      return;
+    }
+
     setSelectedOption(optionObj);
     setInvestmentAmount(initialThreshold);
     setInputError("");
@@ -76,6 +99,13 @@ export default function TradeCard({ product, onPlaceTrade }) {
     const parsedOptionId =
       selectedOption._id?.$oid || selectedOption._id || selectedOption.id;
 
+    if (isMarketClosed) {
+      setInputError(
+        "This market has already closed and can no longer accept new buys.",
+      );
+      return;
+    }
+
     if (!parsedOptionId || !parsedProductId) {
       setInputError(
         "System parsing failure tracking choice data parameters. Please try again.",
@@ -102,7 +132,7 @@ export default function TradeCard({ product, onPlaceTrade }) {
     if (!dateString) return "soon";
     const dateObj = new Date(dateString);
     if (isNaN(dateObj)) return "soon";
-    const diffMs = dateObj.getTime() - Date.now();
+    const diffMs = dateObj.getTime() - currentTime;
     if (diffMs <= 0) return "ended";
 
     let remaining = diffMs;
@@ -145,6 +175,8 @@ export default function TradeCard({ product, onPlaceTrade }) {
             <button
               key={optIdString}
               className="mcq-option-row-btn"
+              type="button"
+              disabled={isMarketClosed}
               onClick={() => handleOptionSelect(opt)}
               style={{
                 display: "flex",
@@ -154,7 +186,8 @@ export default function TradeCard({ product, onPlaceTrade }) {
                 padding: "12px 16px",
                 marginBottom: "8px",
                 borderRadius: "8px",
-                cursor: "pointer"
+                cursor: isMarketClosed ? "not-allowed" : "pointer",
+                opacity: isMarketClosed ? 0.55 : 1,
               }}
             >
               <span className="option-text-lbl" style={{ fontWeight: "600" }}>
@@ -251,7 +284,7 @@ export default function TradeCard({ product, onPlaceTrade }) {
               type="button"
               className="slip-btn-execute"
               onClick={handleConfirmOrder}
-              disabled={!!inputError || investmentAmount <= 0}
+              disabled={isMarketClosed || !!inputError || investmentAmount <= 0}
             >
               Confirm & Invest ₹{investmentAmount}
             </button>

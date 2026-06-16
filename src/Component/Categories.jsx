@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import TradeCard from './TradeCard';
 import { getLiveProductsFeed, placeMarketPrediction } from '../Api';
@@ -24,7 +24,7 @@ export default function Categories() {
   const [currentLang, setCurrentLang] = useState('EN');
 
   // 2️⃣ Protection Shield: Direct access guard & Fetch Data
-  const loadCategoryData = async () => {
+  const loadCategoryData = useCallback(async () => {
     if (!category) {
       setErrorMessage("No active marketplace category context selected. Please return home.");
       setLoading(false);
@@ -49,11 +49,19 @@ export default function Categories() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [category]);
 
   useEffect(() => {
     loadCategoryData();
-  }, [category]);
+  }, [loadCategoryData]);
+
+  useEffect(() => {
+    const categoryPollingInterval = setInterval(() => {
+      loadCategoryData();
+    }, 30000);
+
+    return () => clearInterval(categoryPollingInterval);
+  }, [loadCategoryData]);
 
   // Dynamically synchronize navigation subtabs based on selected language
   useEffect(() => {

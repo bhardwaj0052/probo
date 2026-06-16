@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { getLiveProductsFeed, getuserData } from "../Api";
@@ -16,6 +16,9 @@ export default function Home() {
   // New States for enhanced professional features
   const [activeTab, setActiveTab] = useState("All");
   const [tickerVolume, setTickerVolume] = useState(482910);
+
+  // Use a ref to track product IDs silently across renders to detect genuine additions
+  const currentProductIdsRef = useRef([]);
 
   // Live platform statistical values
   const statsMetrics = [
@@ -45,9 +48,46 @@ export default function Home() {
     }
   };
 
+  // 1. Isolated Function to check and pull fresh marketplace additions
+  const fetchMarketplaceData = useCallback(async (isSilentPoll = false) => {
+    try {
+      const data = await getLiveProductsFeed();
+      if (data && data.products) {
+        const allProducts = data.products;
+        const freshIds = allProducts.map((p) => p._id).join(",");
+        const oldIds = currentProductIdsRef.current.join(",");
+
+        // IF we are polling, and the product IDs match exactly, exit early to avoid re-rendering layout
+        if (isSilentPoll && freshIds === oldIds) {
+          return; 
+        }
+
+        // Cache the newest batch IDs
+        currentProductIdsRef.current = allProducts.map((p) => p._id);
+
+        const uniqueCategoryNames = [
+          ...new Set(allProducts.map((p) => p.category).filter(Boolean)),
+        ];
+
+        const colorAccents = [
+          "#915EFF", "#fbbf24", "#ec4899", "#3b82f6", "#10b981", "#a855f7"
+        ];
+        const computedCategories = uniqueCategoryNames.map((cat, idx) => ({
+          name: cat,
+          accent: colorAccents[idx % colorAccents.length],
+        }));
+
+        setCategories(computedCategories);
+        setTrendingQuestions(allProducts.slice(0, 6));
+      }
+    } catch (err) {
+      console.error("Failed to compile marketplace category channels via API service:", err);
+    }
+  }, []);
+
+  // 2. Authentication & Ticker Setup (Runs only once on mount)
   useEffect(() => {
-    const localToken =
-      localStorage.getItem("auth_token") || Cookies.get("proboWebUser");
+    const localToken = localStorage.getItem("auth_token") || Cookies.get("proboWebUser");
     const localLoginFlag = localStorage.getItem("isLoggedIn");
     const savedUserId = localStorage.getItem("userId");
 
@@ -70,7 +110,6 @@ export default function Home() {
 
     window.addEventListener("refreshWalletBalance", triggerGlobalSync);
 
-    // Smooth background ticker increment to emulate global trade volume updates
     const interval = setInterval(() => {
       setTickerVolume((prev) => prev + Math.floor(Math.random() * 4) + 1);
     }, 3000);
@@ -81,41 +120,20 @@ export default function Home() {
     };
   }, []);
 
+  // 3. Isolated Polling Engine for Products additions (Every 30 seconds)
   useEffect(() => {
-    async function fetchMarketplaceData() {
-      try {
-        const data = await getLiveProductsFeed();
-        if (data && data.products) {
-          const allProducts = data.products;
-          const uniqueCategoryNames = [
-            ...new Set(allProducts.map((p) => p.category).filter(Boolean)),
-          ];
+    // Initial fetch on mount
+    fetchMarketplaceData(false);
 
-          const colorAccents = [
-            "#915EFF",
-            "#fbbf24",
-            "#ec4899",
-            "#3b82f6",
-            "#10b981",
-            "#a855f7",
-          ];
-          const computedCategories = uniqueCategoryNames.map((cat, idx) => ({
-            name: cat,
-            accent: colorAccents[idx % colorAccents.length],
-          }));
+    // Dynamic 30s background lookup
+    const productsPollingInterval = setInterval(() => {
+      fetchMarketplaceData(true); // Flag true sets up deep ID comparison
+    }, 30000);
 
-          setCategories(computedCategories);
-          setTrendingQuestions(allProducts.slice(0, 6)); // Comfortably fill grid space
-        }
-      } catch (err) {
-        console.error(
-          "Failed to compile marketplace category channels via API service:",
-          err,
-        );
-      }
-    }
-    fetchMarketplaceData();
-  }, []);
+    return () => {
+      clearInterval(productsPollingInterval);
+    };
+  }, [fetchMarketplaceData]);
 
   const handleMarketNavigation = (
     catName,
@@ -131,7 +149,6 @@ export default function Home() {
     });
   };
 
-  // Filter trending questions based on top horizontal secondary filters
   const filteredQuestions =
   activeTab === "All"
     ? trendingQuestions
@@ -229,7 +246,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* 3. Embedded Slanted Live Event Arena Card */}
             <div className="glass-match-card preview-premium-card static-trust-widget">
               <div className="premium-time-badge platform-status-badge">
                 <div className="pulse-dot radar-pulse"></div> SYSTEM ACTIVE
@@ -333,7 +349,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 4. Filter Interactive Feed Switcher Pills */}
             <div className="space-y-3">
               <div className="feed-filter-bar">
                 <h3 className="section-title">Trending Questions</h3>
@@ -344,7 +359,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 🚀 RESTORED & DYNAMIC: आपका पुराना ओरिजिनल कार्ड लेआउट अब पूरी तरह API ऑप्शंस के साथ सिंक है */}
               <div className="trending-grid">
                 {filteredQuestions.length > 0 ? (
                   filteredQuestions.map((item) => (
@@ -369,7 +383,6 @@ export default function Home() {
                       
                       <h4 className="trend-question">{item.question}</h4>
 
-                      {/* 🚀 FIXED BIDDING ROW: बिना किसी प्राइस टैग के सीधे डेटाबेस से डायनामिक बटन्स रेंडर हो रहे हैं */}
                       <div className="trend-mini-bidding-row">
                         {item.options && item.options.length > 0 ? (
                           item.options.map((opt, idx) => (
